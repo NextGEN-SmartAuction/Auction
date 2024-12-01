@@ -119,7 +119,7 @@ function AddProduct() {
                                 type="datetime-local"
                                 className="form-control"
                                 id="startDateTime"
-                                value={startDateTime}
+                                value={endDateTime}
                                 onChange={(e) => setEndDateTime(e.target.value)}
                             />
                         </div>
