@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-// import "./SellerRegister.css"; // Import the custom CSS file
+import "./SellerRegister.css"; // Import the custom CSS file
 
 const Seller_register = () => {
     const [form, setForm] = useState({
