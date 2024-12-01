@@ -28,6 +28,16 @@ function Navbar() {
                     Log In
                 </button>
             </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <button className="btn btn-dark" onClick={() => navigate('/add')}>
+                    ADD
+                </button>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <button className="btn btn-dark" onClick={() => navigate('/register')}>
+                    register
+                </button>
+            </div>
             
         </nav>
     );
