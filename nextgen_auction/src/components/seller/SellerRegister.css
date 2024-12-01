@@ -1,94 +1,145 @@
-/* General container styles */
-.container {
-    max-width: 800px;
-    background-color: #f8f9fa;
+/* Center the entire container on the page */
+.seller-register-container {
+    max-width: 900px;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa); /* Soft gradient for the form background */
     padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow for a lifted look */
+    margin: 2rem auto;
+    border: 1px solid #e0e0e0; /* Light border for structure */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-/* Form headers */
-h2, h4, h5 {
-    color: #343a40;
+.seller-register-container:hover {
+    transform: scale(1.002); /* Slight zoom effect on hover */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+}
+
+/* Center align text headers */
+.seller-register-container h2,
+.seller-register-container h4,
+.seller-register-container h5 {
+    color: #333333;
+    text-align: center;
+    font-family: 'Poppins', sans-serif; /* Modern and clean font */
+    font-weight: 600;
+    margin-bottom: 1rem;
 }
 
 /* Cards for grouping sections */
-.card {
+.seller-register-container .card {
     background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
+    border: 1px solid #e4e4e4;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for cards */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.seller-register-container .card:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Slight hover effect for cards */
 }
 
 /* Labels */
-label {
+.seller-register-container label {
     font-weight: bold;
-    color: #495057;
+    color: #555555;
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
 /* Inputs and Textarea */
-.form-control {
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    transition: border-color 0.3s ease-in-out;
-}
-
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
-}
-
-/* Buttons */
-.btn {
+.seller-register-container input,
+.seller-register-container textarea {
     font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
+    border-radius: 8px; /* Rounded corners for inputs */
+    border: 1px solid #ced4da;
+    padding: 0.8rem;
+    width: 100%;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle inset shadow */
     transition: all 0.3s ease-in-out;
 }
 
-.btn-primary {
-    background-color: #007bff;
-    border: none;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    border: none;
-}
-
-.btn-secondary:hover {
-    background-color: #495057;
+.seller-register-container input:focus,
+.seller-register-container textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5); /* Glow effect on focus */
+    outline: none;
 }
 
 /* File input */
-input[type="file"] {
-    padding: 0.3rem;
+.seller-register-container input[type="file"] {
+    padding: 0.4rem;
     font-size: 0.9rem;
 }
 
-/* Additional spacing */
-.mb-3 {
-    margin-bottom: 1.5rem !important;
+/* Buttons */
+.seller-register-container button {
+    padding: 0.6rem 2rem;
+    font-size: 1rem;
+    border-radius: 30px; /* Rounded buttons for a modern look */
+    border: none;
+    transition: all 0.3s ease-in-out;
 }
 
-.text-center button {
-    margin-top: 1rem;
+.seller-register-container button.me-2 {
+    margin-right: 1rem;
+}
+
+.seller-register-container button.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3); /* Gradient background */
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.seller-register-container button.btn-primary:hover {
+    background: linear-gradient(45deg, #0056b3, #003f7f); /* Darker gradient on hover */
+    box-shadow: 0 4px 10px rgba(0, 91, 187, 0.5); /* Add shadow effect */
+}
+
+.seller-register-container button.btn-secondary {
+    background-color: #6c757d;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.seller-register-container button.btn-secondary:hover {
+    background-color: #495057;
+    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.5);
+}
+
+/* Address sub-section headers */
+.seller-register-container h5 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #555555;
+    text-transform: uppercase; /* Adds a professional touch */
 }
 
 /* Responsive Design */
 @media (max-width: 576px) {
-    .container {
+    .seller-register-container {
         padding: 1rem;
     }
 
-    .card {
-        padding: 1rem;
-    }
-
-    h2 {
+    .seller-register-container h2 {
         font-size: 1.5rem;
     }
+
+    .seller-register-container button {
+        width: 100%; /* Make buttons full width on small screens */
+    }
+}
+
+/* Body background */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0eafc, #cfdef3); /* Subtle background gradient */
+    margin: 0;
+    padding: 2rem 0;
+    font-family: 'Poppins', sans-serif; /* Apply a modern font */
 }

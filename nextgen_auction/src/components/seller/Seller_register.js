@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./SellerRegister.css"; // Import the custom CSS file
+import "./SellerRegister.css"; // Import the scoped CSS file
 
 const Seller_register = () => {
     const [form, setForm] = useState({
@@ -75,7 +75,7 @@ const Seller_register = () => {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="seller-register-container mt-5">
             <h2 className="text-center mb-4">Seller Signup</h2>
             <form onSubmit={handleSubmit}>
                 {/* Login Details */}
@@ -173,11 +173,9 @@ const Seller_register = () => {
                             />
                         </div>
                     </div>
-                </div>
 
-                {/* Address Section */}
-                <div className="card p-4 mb-4">
-                    <h4>Address Details</h4>
+                    {/* Address */}
+                    <h4>Address</h4>
                     <div className="row">
                         <div className="col-md-4 mb-3">
                             <label>Country</label>
@@ -230,11 +228,7 @@ const Seller_register = () => {
                             />
                         </div>
                     </div>
-                </div>
 
-                {/* Document Upload Section */}
-                <div className="card p-4 mb-4">
-                    <h4>Documents</h4>
                     <div className="row">
                         <div className="col-md-6 mb-3">
                             <label>Seller Logo</label>
@@ -254,7 +248,7 @@ const Seller_register = () => {
                                 onChange={handleInputChange}
                             ></textarea>
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label>Seller License</label>
                             <input
                                 type="file"
@@ -263,7 +257,7 @@ const Seller_register = () => {
                                 onChange={handleFileChange}
                             />
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label>Aadhaar</label>
                             <input
                                 type="file"
@@ -272,7 +266,7 @@ const Seller_register = () => {
                                 onChange={handleFileChange}
                             />
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label>PAN Card</label>
                             <input
                                 type="file"
