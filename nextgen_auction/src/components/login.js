@@ -36,11 +36,11 @@ const LoginPage = (props) => {
                 props.flag(true);
 
                 const { token, role, user } = response.data;
-                
+
                 navigate(`/${role}`);
                 window.location.reload()
 
-              
+
 
             } else {
                 toast.error(' incorrect details', {
