@@ -1,0 +1,99 @@
+/* General Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    padding-top: 15px;
+}
+
+/* Container Styling */
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+}
+/* Header Styling */
+h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Row & Column Layout */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Column Styling for Larger Screens */
+.col-lg-6 {
+    flex: 1 1 calc(50% - 20px);
+}
+
+/* Form Label Styling */
+.form-label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Input, Select, Textarea Styling */
+input, select, textarea {
+    font-size: 1rem;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Focus State for Inputs */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 50px rgba(134, 11, 95, 0.5);
+}
+
+/* File Input Styling */
+input[type="file"] {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* Button Styling */
+button[type="submit"] {
+    background-color: #000000;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #0e7c0e;
+}
+
+/* Price and Date Field Layout */
+input[type="number"], input[type="datetime-local"] {
+    margin-bottom: 20px;
+}
+
+/* Textarea Styling */
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Responsive Layout for Smaller Screens */
+@media (max-width: 768px) {
+    .col-lg-6 {
+        flex: 1 1 100%;
+    }
+}
