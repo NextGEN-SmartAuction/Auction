@@ -1,0 +1,64 @@
+{
+	"compiler": {
+		"version": "0.5.17+commit.d19bba13"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "a",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "b",
+						"type": "uint256"
+					}
+				],
+				"name": "getResult",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"methods": {}
+		},
+		"userdoc": {
+			"methods": {}
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Users/harinathreddy/Documents/Auction/backend/contracts/Admin.sol": "SolidityTest"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Users/harinathreddy/Documents/Auction/backend/contracts/Admin.sol": {
+			"keccak256": "0x1392c9333d46693fa3cc489f3df3b1fa3d964575c9c2266c0eefc8c85de9ce2a",
+			"urls": [
+				"bzz-raw://ea4b269256c5ead057bc1b2cf7559d03e754eccde03ce5aaa6cbbf4fc375536b",
+				"dweb:/ipfs/QmW7CYccmiK6GA8RuHMHDazZZyizDyaLVNtEEA26uQqKUg"
+			]
+		}
+	},
+	"version": 1
+}
