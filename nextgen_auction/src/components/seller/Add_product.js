@@ -714,7 +714,6 @@ function AddProduct() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle form submission logic here, including image upload and API calls
         console.log({
             numberOfParameters,
             category,
@@ -734,7 +733,6 @@ function AddProduct() {
             <h2 className="text-center mb-4">Add Product</h2>
             <form onSubmit={handleSubmit}>
                 <div className="row">
-                    {/* Left Column (First Section) */}
                     <div className="col-lg-6 mb-4">
                         <div className="mb-3">
                             <label htmlFor="numberOfParameters" className="form-label">Number of Parameters:</label>
@@ -757,7 +755,6 @@ function AddProduct() {
                             >
                                 <option value="">- Select Category -</option>
                                 <option value="Vintage Products">Vintage Products</option>
-                                {/* Add more options as needed */}
                             </select>
                         </div>
 
@@ -770,8 +767,18 @@ function AddProduct() {
                                 onChange={(e) => setSubCategory(e.target.value)}
                             >
                                 <option value="">- Select Sub-Category -</option>
-                                {/* Add sub-categories based on the selected category */}
                             </select>
+                        </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="productName" className="form-label">Product Name:</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="productName"
+                                value={productName}
+                                onChange={(e) => setProductName(e.target.value)}
+                            />
                         </div>
 
                         <div className="mb-3">
@@ -785,6 +792,10 @@ function AddProduct() {
                             />
                         </div>
 
+                    </div>
+
+                    <div className="col-lg-6 mb-4">
+
                         <div className="mb-3">
                             <label htmlFor="startDateTime" className="form-label">Start Session (Date & Time):</label>
                             <input
@@ -796,19 +807,14 @@ function AddProduct() {
                             />
                         </div>
 
-                    </div>
-
-                    {/* Right Column (Second Section) */}
-                    <div className="col-lg-6 mb-4">
-
                         <div className="mb-3">
-                            <label htmlFor="priceInterval" className="form-label">Price Interval:</label>
+                            <label htmlFor="startDateTime" className="form-label">End Session (Date & Time):</label>
                             <input
-                                type="text"
+                                type="datetime-local"
                                 className="form-control"
-                                id="priceInterval"
-                                value={priceInterval}
-                                onChange={(e) => setPriceInterval(e.target.value)}
+                                id="startDateTime"
+                                value={startDateTime}
+                                onChange={(e) => setStartDateTime(e.target.value)}
                             />
                         </div>
 
@@ -824,13 +830,13 @@ function AddProduct() {
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="productName" className="form-label">Product Name:</label>
+                            <label htmlFor="priceInterval" className="form-label">Price Interval:</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="productName"
-                                value={productName}
-                                onChange={(e) => setProductName(e.target.value)}
+                                id="priceInterval"
+                                value={priceInterval}
+                                onChange={(e) => setPriceInterval(e.target.value)}
                             />
                         </div>
 
@@ -848,11 +854,9 @@ function AddProduct() {
 
 
                     </div>
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: '12vh' }}>
-                            <button type="submit" className="btn btn-dark w-50">Submit</button>
-                            <button type="submit" className="btn btn-danger w-50">Submit</button>
-                            <button type="submit" className="btn btn-primary w-50">Submit</button>
-                        </div>
+                    <div className="d-flex justify-content-center align-items-center" style={{ height: '12vh' }}>
+                        <button type="submit" className="btn btn-dark w-50">Submit</button>
+                    </div>
                 </div>
             </form>
         </div>
