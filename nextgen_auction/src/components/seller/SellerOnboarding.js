@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./SellerOnboarding.css"; // Import the scoped CSS file
 
 const SellerOnboarding = () => {
     const [form, setForm] = useState({
@@ -74,7 +75,7 @@ const SellerOnboarding = () => {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="seller-register-container mt-5">
             <h2 className="text-center mb-4">Seller Signup</h2>
             <form onSubmit={handleSubmit}>
                 {/* Login Details */}
@@ -172,11 +173,9 @@ const SellerOnboarding = () => {
                             />
                         </div>
                     </div>
-                </div>
 
-                {/* Address Section */}
-                <div className="card p-4 mb-4">
-                    <h4>Address Details</h4>
+                    {/* Address */}
+                    <h5>Address</h5>
                     <div className="row">
                         <div className="col-md-4 mb-3">
                             <label>Country</label>
@@ -229,11 +228,7 @@ const SellerOnboarding = () => {
                             />
                         </div>
                     </div>
-                </div>
 
-                {/* Document Upload Section */}
-                <div className="card p-4 mb-4">
-                    <h4>Documents</h4>
                     <div className="row">
                         <div className="col-md-6 mb-3">
                             <label>Seller Logo</label>
@@ -253,7 +248,7 @@ const SellerOnboarding = () => {
                                 onChange={handleInputChange}
                             ></textarea>
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label>Seller License</label>
                             <input
                                 type="file"
@@ -262,7 +257,7 @@ const SellerOnboarding = () => {
                                 onChange={handleFileChange}
                             />
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label>Aadhaar</label>
                             <input
                                 type="file"
@@ -271,7 +266,7 @@ const SellerOnboarding = () => {
                                 onChange={handleFileChange}
                             />
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label>PAN Card</label>
                             <input
                                 type="file"
