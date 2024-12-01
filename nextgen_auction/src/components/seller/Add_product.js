@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Make sure Bootstrap is imported
 
 function AddProduct() {
     const [numberOfParameters, setNumberOfParameters] = useState(0);
