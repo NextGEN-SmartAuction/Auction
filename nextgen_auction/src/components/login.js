@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Signup from './Signup';
 const LoginPage = (props) => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
