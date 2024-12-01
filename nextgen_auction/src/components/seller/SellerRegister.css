@@ -1,0 +1,94 @@
+/* General container styles */
+.container {
+    max-width: 800px;
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Form headers */
+h2, h4, h5 {
+    color: #343a40;
+}
+
+/* Cards for grouping sections */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+/* Labels */
+label {
+    font-weight: bold;
+    color: #495057;
+}
+
+/* Inputs and Textarea */
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+/* Buttons */
+.btn {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #495057;
+}
+
+/* File input */
+input[type="file"] {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+}
+
+/* Additional spacing */
+.mb-3 {
+    margin-bottom: 1.5rem !important;
+}
+
+.text-center button {
+    margin-top: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}
