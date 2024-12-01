@@ -29,13 +29,13 @@ function Navbar() {
                 </button>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button className="btn btn-dark" onClick={() => navigate('/add')}>
-                    ADD
+                <button className="btn btn-dark" onClick={() => navigate('/AddProduct')}>
+                AddProduct
                 </button>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button className="btn btn-dark" onClick={() => navigate('/register')}>
-                    register
+                <button className="btn btn-dark" onClick={() => navigate('/SellerOnboarding')}>
+                SellerOnboarding
                 </button>
             </div>
             
