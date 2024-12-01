@@ -703,6 +703,7 @@ function AddProduct() {
     const [auctionType, setAuctionType] = useState('');
     const [productImage, setProductImage] = useState(null);
     const [startDateTime, setStartDateTime] = useState('');
+    const [endDateTime, setEndDateTime] = useState('');
     const [priceInterval, setPriceInterval] = useState('');
     const [productName, setProductName] = useState('');
     const [description, setDescription] = useState('');
@@ -814,7 +815,7 @@ function AddProduct() {
                                 className="form-control"
                                 id="startDateTime"
                                 value={startDateTime}
-                                onChange={(e) => setStartDateTime(e.target.value)}
+                                onChange={(e) => setEndDateTime(e.target.value)}
                             />
                         </div>
 
