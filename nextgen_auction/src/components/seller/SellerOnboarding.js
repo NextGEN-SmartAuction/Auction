@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import "./SellerRegister.css"; // Import the custom CSS file
 
-const Seller_register = () => {
+const SellerOnboarding = () => {
     const [form, setForm] = useState({
         email: "",
         password: "",
@@ -298,4 +297,4 @@ const Seller_register = () => {
     );
 };
 
-export default Seller_register;
+export default SellerOnboarding;
