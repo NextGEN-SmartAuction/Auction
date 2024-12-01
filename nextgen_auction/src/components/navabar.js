@@ -28,6 +28,7 @@ function Navbar() {
                     Log In
                 </button>
             </div>
+            
         </nav>
     );
 }
