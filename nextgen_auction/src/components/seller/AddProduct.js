@@ -4,7 +4,6 @@ function AddProduct() {
     const [numberOfParameters, setNumberOfParameters] = useState(0);
     const [category, setCategory] = useState('');
     const [subCategory, setSubCategory] = useState('');
-    const [auctionType, setAuctionType] = useState('');
     const [productImage, setProductImage] = useState(null);
     const [startDateTime, setStartDateTime] = useState('');
     const [endDateTime, setEndDateTime] = useState('');
@@ -23,7 +22,6 @@ function AddProduct() {
             numberOfParameters,
             category,
             subCategory,
-            auctionType,
             productImage,
             startDateTime,
             priceInterval,
