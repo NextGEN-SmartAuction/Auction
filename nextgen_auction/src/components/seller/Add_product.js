@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './AddProduct.css';
 
 function AddProduct() {
     const [numberOfParameters, setNumberOfParameters] = useState(0);
