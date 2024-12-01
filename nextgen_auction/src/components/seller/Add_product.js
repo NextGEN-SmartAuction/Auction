@@ -520,7 +520,6 @@
 
 
 import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap is imported
 
 function AddProduct() {
     const [numberOfParameters, setNumberOfParameters] = useState(0);
