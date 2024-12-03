@@ -4,12 +4,8 @@ import Hero from './components/Hero';
 import Home from './components/Home';
 import Login from './components/Login';
 import Navbar from './components/Navbar';
-<<<<<<< Updated upstream
-import NavbarWithHover from './components/options';
-=======
 import SellerOnboarding from './components/seller/SellerOnboarding';
 import BidderOnboarding from './components/bidder/BidderOnboarding';
->>>>>>> Stashed changes
 import AddProduct from "./components/seller/AddProduct";
 import SellerOnboarding from './components/seller/SellerOnboarding';
 
