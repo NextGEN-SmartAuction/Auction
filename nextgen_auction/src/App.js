@@ -7,11 +7,13 @@ import Navbar from './components/Navbar';
 import SellerOnboarding from './components/seller/SellerOnboarding';
 import BidderOnboarding from './components/bidder/BidderOnboarding';
 import AddProduct from "./components/seller/AddProduct";
+import NavbarWithHover from './components/options';
 
 function App() {
     return (
         <Router>
             <Hero/>
+            <NavbarWithHover/>
             <div>
                 <Navbar />
                 <main>
