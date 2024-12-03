@@ -4,7 +4,6 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
 
-<<<<<<< Updated upstream
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
@@ -14,51 +13,6 @@ const Navbar = () => {
       setIsLoggedIn(false);
     }
   }, []);
-=======
-    return (
-        <nav
-            style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '10px 20px',
-                borderBottom: '1px solid #ddd',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                height: '60px',
-                width: '100%',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            }}
-        >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                {/* Logo or Home button can go here if needed in the future */}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                {/* Login Button */}
-                <button className="btn btn-dark" onClick={() => navigate('/login')}>
-                    Log In
-                </button>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button className="btn btn-dark" onClick={() => navigate('/AddProduct')}>
-                AddProduct
-                </button>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button className="btn btn-dark" onClick={() => navigate('/SellerOnboarding')}>
-                SellerOnboarding
-                </button>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button className="btn btn-dark" onClick={() => navigate('/BidderOnboarding')}>
-                BidderOnboarding
-                </button>
-            </div>
-            
-        </nav>
-    );
-}
->>>>>>> Stashed changes
 
   const handleLogin = () => {
     const user = { name: "John Doe", email: "johndoe@example.com" };
