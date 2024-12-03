@@ -26,11 +26,9 @@ const addressSchema = new mongoose.Schema({
 
 // BidderDetails Schema
 const bidderDetailsSchema = new mongoose.Schema({
-    email: {
+    userName: {
         type: String,
         required: true,
-        unique: true,  // Ensure unique email addresses
-        trim: true,  // Remove any extra spaces from email
     },
     name: {
         type: String,
@@ -39,6 +37,12 @@ const bidderDetailsSchema = new mongoose.Schema({
     displayName: {
         type: String,
         required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,  // Ensure unique email addresses
+        trim: true,  // Remove any extra spaces from email
     },
     phoneNumber: {
         type: String,

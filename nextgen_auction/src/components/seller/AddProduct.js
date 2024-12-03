@@ -56,7 +56,7 @@ function AddProduct() {
     };
 
     return (
-        <div className="container  p-4 col-9 border-2">
+        <div className="container  p-2 col-11 border-2">
             <h2 className="text-center mb-4">Add Product</h2>
             <form onSubmit={handleSubmit}>
                 <div className="card shadow borderp">

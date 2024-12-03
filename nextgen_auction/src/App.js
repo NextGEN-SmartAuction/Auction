@@ -1,57 +1,111 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 import Hero from './components/Hero';
 import Home from './components/Home';
-import React, { useEffect, useState } from "react";
-import Cookies from 'js-cookie';
-import axios from "axios";
 import Login from './components/Login';
 import Navbar from './components/Navbar';
 import SellerOnboarding from './components/seller/SellerOnboarding';
 import BidderOnboarding from './components/bidder/BidderOnboarding';
-import AddProduct from "./components/seller/AddProduct";
+import AddProduct from './components/seller/AddProduct';
+import SellerDashBoard from './components/seller/SellerDashboard';
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
+    const [role, setRole] = useState(null);
 
     useEffect(() => {
-        if (Cookies.get('jwt')) {
+        const jwtToken = Cookies.get('jwt');
+        if (jwtToken) {
             const checkAuthenticationStatus = async () => {
                 try {
-                    const response = await axios.get(`${process.env.REACT_APP_ServerUrl}/profile`, { withCredentials: true });
-                    const { username } = response.data;
-
+                    const response = await axios.get(
+                        `${process.env.REACT_APP_ServerUrl}/profile`,
+                        { withCredentials: true }
+                    );
+                    const { role } = response.data;
                     setLoggedIn(true);
+                    setRole(role);
                 } catch (error) {
-                    console.error(error);
-                } finally {
-                    console.log("hello ")
+                    console.error('Authentication check failed:', error);
                 }
             };
             checkAuthenticationStatus();
         }
     }, []);
+
+    const renderRoutes = () => {
+        if (!loggedIn) {
+            return (
+                <Routes>
+                    <Route path="/" element={<Hero />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/SellerOnboarding" element={<SellerOnboarding />} />
+                    <Route path="/BidderOnboarding" element={<BidderOnboarding />} />
+                </Routes>
+            );
+        }
+
+        switch (role) {
+            case 'admin':
+                return (
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        {/* Add more admin-specific routes here */}
+                    </Routes>
+                );
+            case 'seller':
+                return (
+                    <Routes>
+                        <Route
+                            path="/seller"
+                            element={
+                                <>
+                                    <SellerDashBoard />
+                                    <Hero />
+                                </>
+                            }
+                        />
+                        <Route path="/seller/*" element={<SellerDashBoard />} />
+                        <Route
+                            path="/seller/AddProduct"
+                            element={
+                                <>
+                                    <SellerDashBoard />
+
+                                    <AddProduct />
+                                </>
+                            }
+                        />
+                        {/* Add more seller-specific routes here */}
+                    </Routes>
+                );
+
+            case 'bidder':
+                return (
+                    <Routes>
+                        <Route path="/bidder" element={<Home />} />
+                        {/* Add more bidder-specific routes here */}
+                    </Routes>
+                );
+            default:
+                return (
+                    <Routes>
+                        <Route path="/" element={<Hero />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/SellerOnboarding" element={<SellerOnboarding />} />
+                        <Route path="/BidderOnboarding" element={<BidderOnboarding />} />
+                    </Routes>
+                );
+        }
+    };
+
     return (
         <Router>
             <div>
                 <Navbar />
-                <main>
-                    <Routes>
-                        <Route
-                            path="/"
-                            element={
-                                loggedIn ? (
-                                    <Home />
-                                ) : (
-                                    <Hero />
-                                )
-                            }
-                        />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/SellerOnboarding" element={<SellerOnboarding />} />
-                        <Route path="/BidderOnboarding" element={<BidderOnboarding />} />
-                        <Route path="/AddProduct" element={<AddProduct />} />
-                    </Routes>
-                </main>
+                <main>{renderRoutes()}</main>
             </div>
         </Router>
     );

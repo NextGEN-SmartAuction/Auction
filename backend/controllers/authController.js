@@ -22,7 +22,7 @@ var otp1 = 1;
 
 
 const generateToken = (user) => {
-    return jwt.sign({ username: user.username }, 'secret_key is blash');
+    return jwt.sign({ username: user.username ,role:user.role,displayName: user.displayName}, 'secret_key is blash');
 };
 
 const getotp = async (req, res) => {
@@ -97,9 +97,10 @@ const signup = async (req, res) => {
 
         if (req.body.role === 'bidder') {
             const newBidder = new BidderDetailsModel({
-                email: req.body.email,
+                userName: req.body.userName,
                 name: req.body.name,
                 displayName: req.body.displayName,
+                email: req.body.email,
                 phoneNumber: req.body.phoneNumber,
                 address: req.body.address,
             });
@@ -111,6 +112,7 @@ const signup = async (req, res) => {
         // Now save the user information (this applies for both "seller" and other roles)
         const newUser = new UserModel({
             username: req.body.userName,
+            displayName: req.body.displayName,
             email: req.body.email,
             password: req.body.password,
             role: req.body.role,
@@ -174,8 +176,8 @@ const getProfile = (req, res) => {
     if (token) {
         try {
             const decoded = jwt.verify(token, 'secret_key is blash');
-            const { username } = decoded;
-            res.json({ username });
+            const { username,role,displayName } = decoded;
+            res.json({ username,role ,displayName});
         } catch (err) {
             res.sendStatus(401); // Invalid token
         }

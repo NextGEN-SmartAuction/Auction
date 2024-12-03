@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const BidderSignup = () => {
     const [form, setForm] = useState({
+        userName: "",
         email: "",
         role: "bidder",
         password: "",
@@ -53,6 +54,7 @@ const BidderSignup = () => {
 
     const validateForm = () => {
         const newErrors = {};
+        if (!form.userName) newErrors.userName = "userName is required";
         if (!form.email) newErrors.email = "Email is required";
         if (!form.password) newErrors.password = "Password is required";
         if (form.password !== form.confirmPassword)
@@ -105,6 +107,20 @@ const BidderSignup = () => {
                 <div className="card-body">
                     <h2 className="text-center mb-4">Bidder Signup</h2>
                     <form onSubmit={handleSubmit}>
+
+                        <div className="mb-3">
+                            <label htmlFor="userName" className="form-label">User Name</label>
+                            <input
+                                type="text"
+                                className={`form-control ${errors.userName ? "is-invalid" : ""}`}
+                                id="userName"
+                                name="userName"
+                                value={form.userName}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                        </div>
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label">Email</label>
                             <input
