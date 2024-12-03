@@ -1,0 +1,192 @@
+[
+    {
+        "email": "vishnudathrock@gmail.com",
+        "password": "123",
+        "confirmPassword": "123",
+        "sellerName": "Vishnu Dath",
+        "displayName": "Vishnu",
+        "orgName": "tnt",
+        "website": "http:///dfff",
+        "address": {
+            "country": "India",
+            "state": "Delhi",
+            "city": "New Delhi",
+            "pincode": "555533",
+            "location": "adddd"
+        },
+        "logo": {},
+        "caption": "our company",
+        "primaryMobile": "7989141069",
+        "secondaryMobile": "7989141069",
+        "items": [
+            {
+                "itemName": "Antique Vase",
+                "itemDescription": "A beautifully crafted antique vase from the 18th century.",
+                "itemCategory": "Antiques",
+                "itemStartDate": "2024-12-01T10:00:00",
+                "itemEndDate": "2024-12-15T18:00:00",
+                "startingBid": 500,
+                "currentBid": 500,
+                "auctionStatus": "open",
+                "itemImages": [
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0PkeA0lA0d7Kl49HCK6GSVM7neRhfdiwt7A&s",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0PkeA0lA0d7Kl49HCK6GSVM7neRhfdiwt7A&s"
+                ],
+                "itemLocation": "New Delhi",
+                "sellerId": "vishnudathrock"
+            }
+        ]
+    },
+    {
+        "email": "john.doe@gmail.com",
+        "password": "123",
+        "confirmPassword": "123",
+        "sellerName": "John Doe",
+        "displayName": "John",
+        "orgName": "jnd_antiques",
+        "website": "http://jndantiques.com",
+        "address": {
+            "country": "India",
+            "state": "Delhi",
+            "city": "New Delhi",
+            "pincode": "555533",
+            "location": "Delhi Street"
+        },
+        "logo": {},
+        "caption": "Fine Antiques",
+        "primaryMobile": "7989141070",
+        "secondaryMobile": "7989141070",
+        "items": [
+            {
+                "itemName": "Luxury Watch",
+                "itemDescription": "A high-end luxury watch with a stainless steel band.",
+                "itemCategory": "Watches",
+                "itemStartDate": "2024-12-05T12:00:00",
+                "itemEndDate": "2024-12-20T12:00:00",
+                "startingBid": 2000,
+                "currentBid": 2200,
+                "auctionStatus": "open",
+                "itemImages": [
+                    "https://www.jbl.com/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-siteCatalog_JB_US_Imported/default/dw0c3ec204/categoryimage/Charge5.jpg?sw=800&sh=400",
+                    "https://www.jbl.com/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-siteCatalog_JB_US_Imported/default/dw0c3ec204/categoryimage/Charge5.jpg?sw=800&sh=400"
+                ],
+                "itemLocation": "New Delhi",
+                "sellerId": "jnd_antiques"
+            }
+        ]
+    },
+    {
+        "email": "alice.smith@gmail.com",
+        "password": "123",
+        "confirmPassword": "123",
+        "sellerName": "Alice Smith",
+        "displayName": "Alice",
+        "orgName": "art_world",
+        "website": "http://artworld.com",
+        "address": {
+            "country": "India",
+            "state": "Delhi",
+            "city": "New Delhi",
+            "pincode": "555533",
+            "location": "Art District"
+        },
+        "logo": {},
+        "caption": "World of Art",
+        "primaryMobile": "7989141071",
+        "secondaryMobile": "7989141071",
+        "items": [
+            {
+                "itemName": "Vintage Painting",
+                "itemDescription": "A rare vintage painting from the early 1900s, beautifully framed.",
+                "itemCategory": "Art",
+                "itemStartDate": "2024-12-10T14:00:00",
+                "itemEndDate": "2024-12-25T18:00:00",
+                "startingBid": 800,
+                "currentBid": 850,
+                "auctionStatus": "open",
+                "itemImages": [
+                    "https://5.imimg.com/data5/SELLER/Default/2023/6/317893798/JW/KX/TS/33267804/whatsapp-image-2023-06-19-at-2-00-25-pm-1-.jpeg",
+                    "https://5.imimg.com/data5/SELLER/Default/2023/6/317893798/JW/KX/TS/33267804/whatsapp-image-2023-06-19-at-2-00-25-pm-1-.jpeg"
+                ],
+                "itemLocation": "New Delhi",
+                "sellerId": "art_world"
+            }
+        ]
+    },
+    {
+        "email": "bob.jones@gmail.com",
+        "password": "123",
+        "confirmPassword": "123",
+        "sellerName": "Bob Jones",
+        "displayName": "Bob",
+        "orgName": "vintage_vehicles",
+        "website": "http://vintagevehicles.com",
+        "address": {
+            "country": "India",
+            "state": "Delhi",
+            "city": "New Delhi",
+            "pincode": "555533",
+            "location": "Collector's Area"
+        },
+        "logo": {},
+        "caption": "Vintage Cars for Enthusiasts",
+        "primaryMobile": "7989141072",
+        "secondaryMobile": "7989141072",
+        "items": [
+            {
+                "itemName": "Classic Car",
+                "itemDescription": "A 1965 model classic car, in mint condition, perfect for collectors.",
+                "itemCategory": "Vehicles",
+                "itemStartDate": "2024-12-12T16:00:00",
+                "itemEndDate": "2024-12-22T20:00:00",
+                "startingBid": 30000,
+                "currentBid": 32000,
+                "auctionStatus": "open",
+                "itemImages": [
+                    "https://gemologue.com/wp-content/uploads/2020/01/5S6A6668-752x752.jpg",
+                    "https://www.picclickimg.com/yVwAAOSwU05lW1Eg/Samsung-TV-39.webp"
+                ],
+                "itemLocation": "New Delhi",
+                "sellerId": "vintage_vehicles"
+            }
+        ]
+    },
+    {
+        "email": "mary.white@gmail.com",
+        "password": "123",
+        "confirmPassword": "123",
+        "sellerName": "Mary White",
+        "displayName": "Mary",
+        "orgName": "gold_jewels",
+        "website": "http://goldjewels.com",
+        "address": {
+            "country": "India",
+            "state": "Delhi",
+            "city": "New Delhi",
+            "pincode": "555533",
+            "location": "Jewelry Street"
+        },
+        "logo": {},
+        "caption": "Luxury Gold Jewels",
+        "primaryMobile": "7989141073",
+        "secondaryMobile": "7989141073",
+        "items": [
+            {
+                "itemName": "Gold Necklace",
+                "itemDescription": "A 24K gold necklace with intricate designs, perfect for weddings.",
+                "itemCategory": "Jewelry",
+                "itemStartDate": "2024-12-15T18:00:00",
+                "itemEndDate": "2024-12-30T22:00:00",
+                "startingBid": 5000,
+                "currentBid": 5500,
+                "auctionStatus": "open",
+                "itemImages": [
+                    "https://www.picclickimg.com/yVwAAOSwU05lW1Eg/Samsung-TV-39.webp",
+                    "https://gemologue.com/wp-content/uploads/2020/01/5S6A6668-752x752.jpg"
+                ],
+                "itemLocation": "New Delhi",
+                "sellerId": "gold_jewels"
+            }
+        ]
+    }
+]

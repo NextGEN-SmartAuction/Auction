@@ -137,10 +137,12 @@
 
 
 import React from 'react';
-
+import AuctionItems from './AuctionItems';
 const Home = () => {
     return (
-        <h1>Home</h1>
+        <div>
+            <AuctionItems/>
+        </div>
     );
 };
 

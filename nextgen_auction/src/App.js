@@ -1,14 +1,18 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Hero from './components/Hero';
 import Home from './components/Home';
 import Login from './components/Login';
 import Navbar from './components/Navbar';
-import SellerOnboarding from './components/seller/SellerOnboarding';
+import NavbarWithHover from './components/options';
 import AddProduct from "./components/seller/AddProduct";
+import SellerOnboarding from './components/seller/SellerOnboarding';
 
 function App() {
     return (
         <Router>
+            <Hero/>
+            <NavbarWithHover/>
             <div>
                 <Navbar />
                 <main>
