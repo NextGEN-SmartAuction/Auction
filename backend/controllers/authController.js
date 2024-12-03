@@ -2,9 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const SellerDetailsModel = require('../models/SellerDetailsModel');
+const BidderDetailsModel = require('../models/BidderDetailsModel');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 
 const FormData = require('form-data');
@@ -17,56 +19,6 @@ var otp1 = 1;
 
 
 
-
-// Dynamic multer destination based on user and folder name
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const { username, foldername } = req.body;
-        const userDir = path.join(__dirname, '../database', username, foldername);
-
-        // Check if directory exists, if not, create it
-        if (!fs.existsSync(userDir)) {
-            fs.mkdirSync(userDir, { recursive: true });
-            console.log(`Created directory: ${userDir}`);
-        }
-
-        cb(null, userDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); // Save file with its original name
-    }
-});
-
-const upload = multer({ storage }).single('file');
-
-
-
-const handleFileUpload = (req, res) => {
-    const { username, foldername } = req.body;
-
-    // Check and create folder dynamically
-    const userDir = path.join(__dirname, '../database', username, foldername);
-    if (!fs.existsSync(userDir)) {
-        fs.mkdirSync(userDir, { recursive: true });
-        console.log(`Created directory: ${userDir}`);
-    }
-
-    // Handle file upload
-    upload(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-            return res.status(500).json({ error: err.message });
-        } else if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
-        }
-
-        console.log(`File saved to /database/${username}/${foldername}/${req.file.originalname}`);
-        res.status(200).json({ message: 'File uploaded successfully', file: req.file });
-    });
-};
 
 
 const generateToken = (user) => {
@@ -124,7 +76,7 @@ const signup = async (req, res) => {
         if (req.body.role === 'seller') {
             // If role is "seller", save the seller details first
             const newSeller = new SellerDetailsModel({
-                userName: req.body.UserName,
+                userName: req.body.userName,
                 sellerName: req.body.sellerName,
                 displayName: req.body.displayName,
                 website: req.body.website,
@@ -142,9 +94,23 @@ const signup = async (req, res) => {
             console.log('Seller details saved:', sellerResult);
         }
 
+
+        if (req.body.role === 'bidder') {
+            const newBidder = new BidderDetailsModel({
+                email: req.body.email,
+                name: req.body.name,
+                displayName: req.body.displayName,
+                phoneNumber: req.body.phoneNumber,
+                address: req.body.address,
+            });
+
+            const bidderResult = await newBidder.save();
+            console.log('Bidder details saved:', bidderResult);
+        }
+
         // Now save the user information (this applies for both "seller" and other roles)
         const newUser = new UserModel({
-            username: req.body.UserName,
+            username: req.body.userName,
             email: req.body.email,
             password: req.body.password,
             role: req.body.role,
@@ -155,11 +121,7 @@ const signup = async (req, res) => {
         console.log('User saved:', result);
 
 
-        const userDir = path.join(__dirname, '../database', username);
-        if (!fs.existsSync(userDir)) {
-            fs.mkdirSync(userDir, { recursive: true });
-            console.log(`Created directory: ${userDir}`);
-        }
+        
         res.sendStatus(200);
 
     } catch (error) {
@@ -226,7 +188,6 @@ const getProfile = (req, res) => {
 
 
 
-const fs = require('fs').promises; // Using fs.promises for asynchronous file operations
 
 
 
@@ -236,7 +197,5 @@ module.exports = {
     signup,
     login,
     getProfile,
-    getotp,
-    handleFileUpload
-
+    getotp
 };

@@ -4,31 +4,34 @@ import { NavLink } from 'react-router-dom';  // Import NavLink for routing
 const Navbar = () => {
     return (
         <nav style={styles.navbar}>
-            <div style={styles.logoContainer} >
-                <img
-                    src="https://media.licdn.com/dms/image/D5612AQEglNXFBaW8ow/article-cover_image-shrink_720_1280/0/1693372240579?e=2147483647&v=beta&t=_JDNHUoa9vfM8_1zinTiCC_c7wP-7d7jVCRyPgGxXVI"
-                    alt="Logo"
-                    style={styles.logo}
-                />
-                <h1 style={styles.title}>NextGen Auction</h1>
+            <div style={styles.logoContainer} className="p-2">
+                {/* Make both the logo and the title clickable and navigate to home (/) */}
+                <NavLink to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                    <img
+                        src="https://media.licdn.com/dms/image/D5612AQEglNXFBaW8ow/article-cover_image-shrink_720_1280/0/1693372240579?e=2147483647&v=beta&t=_JDNHUoa9vfM8_1zinTiCC_c7wP-7d7jVCRyPgGxXVI"
+                        alt="Logo"
+                        style={styles.logo}
+                    />
+                    <h1 style={styles.title}>NextGen Auction</h1>
+                </NavLink>
             </div>
             <div style={styles.menu}>
                 {/* Use NavLink to handle routing and active state */}
                 <NavLink
                     to="/SellerOnboarding"
-                    style={({ isActive }) => isActive ? { ...styles.navItem, ...styles.active } : styles.navItem}
+                    style={({ isActive }) => (isActive ? { ...styles.navItem, ...styles.active } : styles.navItem)}
                 >
                     Seller Onboarding
                 </NavLink>
                 <NavLink
                     to="/BidderOnboarding"
-                    style={({ isActive }) => isActive ? { ...styles.navItem, ...styles.active } : styles.navItem}
+                    style={({ isActive }) => (isActive ? { ...styles.navItem, ...styles.active } : styles.navItem)}
                 >
                     Bidder Onboarding
                 </NavLink>
                 <NavLink
                     to="/login"
-                    style={({ isActive }) => isActive ? { ...styles.navItem, ...styles.active } : styles.navItem}
+                    style={({ isActive }) => (isActive ? { ...styles.navItem, ...styles.active } : styles.navItem)}
                 >
                     Login
                 </NavLink>
@@ -63,6 +66,7 @@ const styles = {
     title: {
         fontSize: '24px',
         fontWeight: 'bold',
+        color: '#fff', // You can set the color of the title to white or any other color to match the style
     },
     menu: {
         display: 'flex',

@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const SellerOnboarding = () => {
     const [form, setForm] = useState({
-        UserName:"",
+        userName:"",
         email: "",
         password: "",
         confirmPassword: "",
@@ -112,17 +112,26 @@ const SellerOnboarding = () => {
         setStep(step - 1);
     };
 
-    const uploadLogo = async (file, userName) => {
+    const uploadLogo = async (file, userName, originalName) => {
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("username", userName); // Use userName from form
-        formData.append("foldername", "logo"); // Static folder name for logos
+        formData.append("file", file); // The file input from the user
+        formData.append("username", userName); // Username of the user
+        formData.append("foldername", "logo"); // Folder name (e.g., 'logo')
+        formData.append("originalName", originalName); // Original name of the file
+    
+        console.log("Form Data:", formData);
     
         try {
-            const response = await axios.post(`${process.env.REACT_APP_ServerUrl}/upload`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-                withCredentials: true,
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_FlaskUrl}/upload`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" }, // Set multipart headers
+                    withCredentials: true, // Send cookies if required for authentication
+                }
+            );
+    
+            console.log("Upload successful:", response.data);
             return response.data; // Returns uploaded file details
         } catch (error) {
             console.error("Failed to upload logo:", error);
@@ -138,9 +147,10 @@ const SellerOnboarding = () => {
     
         try {
             // Extract UserName from form data
-            const userName = form.UserName; // Access UserName directly from the form object
+            const userName = form.userName; // Access UserName directly from the form object
+            const originalName = form.logo; 
             console.log("UserName:", userName);
-    
+        
             // Check if userName exists
             if (!userName) {
                 toast.error("UserName is required!");
@@ -149,8 +159,7 @@ const SellerOnboarding = () => {
     
             // First, upload the logo file if provided
             if (logoFile) {
-                const uploadResponse = await uploadLogo(logoFile, userName);
-                form.logo = uploadResponse.file.filename; // Save uploaded logo file name in the form
+                await uploadLogo(logoFile, userName,originalName);
             }
     
             console.log("Final form data:", form);
@@ -303,8 +312,8 @@ const SellerOnboarding = () => {
                                 <input
                                     type="text"
                                     className="form-control"
-                                    name="UserName" 
-                                    value={form.UserName}
+                                    name="userName" 
+                                    value={form.userName}
                                     onChange={handleInputChange}
                                     required
                                 />

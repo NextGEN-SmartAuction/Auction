@@ -31,10 +31,8 @@ const Hero = () => {
     return (
         <div
             style={{
-                top: 35,
-                position: "relative",
                 width: "100%",
-                maxWidth: "1490px",
+                maxWidth: "1320px",
                 height: "550px",
                 margin: "40px auto",
                 overflow: "hidden",

@@ -1,9 +1,10 @@
+import React, { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const LoginPage = (props) => {
+
+const LoginPage = () => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -16,33 +17,61 @@ const LoginPage = (props) => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get('http://localhost:5000/api/signupdetail', {
+            const response = await axios.get(`${process.env.REACT_APP_ServerUrl}/login`, {
                 params: {
                     identifier: identifier,
                     password: password
                 },
                 withCredentials: true
             });
-
+    
             if (response.data.status === 'success') {
-                axios.get('http://localhost:5000/api/profile', { withCredentials: true })
+                // Handle successful login
+                axios.get(`${process.env.REACT_APP_ServerUrl}/profile`, { withCredentials: true })
                     .then((response) => {
-                        const { role, username } = response.data;
+                        const { username } = response.data;
+                        localStorage.setItem('loggeduser', username);
                     })
                     .catch((error) => {
                         console.error(error);
                     });
-                props.flag(true);
-
-                const { token, role, user } = response.data;
-
-                navigate(`/${role}`);
-                window.location.reload()
-
-
-
+    
+                const { token, user } = response.data;
+                navigate(`/test`);
+                
             } else {
-                toast.error(' incorrect details', {
+              
+            }
+        } catch (error) {
+            console.error(error);
+           
+            console.log(error.response.data.error)
+             // Handle specific error messages
+             if (error.response.data.error === 'UserNotFound') {
+                toast.error('User not found', {
+                    position: 'bottom-right',
+                    autoClose: 1400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                });
+            } else if (error.response.data.error === 'IncorrectPassword') {
+                toast.error('Incorrect password', {
+                    position: 'bottom-right',
+                    autoClose: 1400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                });
+            } else {
+                // Handle other error scenarios
+                toast.error('Login failed', {
                     position: 'bottom-right',
                     autoClose: 1400,
                     hideProgressBar: false,
@@ -53,11 +82,9 @@ const LoginPage = (props) => {
                     theme: 'light',
                 });
             }
-        } catch (error) {
-            console.error(error);
         }
     };
-
+    
     return (
         <div className="modal modal-signin position-static d-block py-2" tabIndex="-1" role="dialog" id="modalSignin">
             <ToastContainer

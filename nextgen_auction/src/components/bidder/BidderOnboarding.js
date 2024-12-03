@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from 'axios';
 
 const BidderSignup = () => {
     const [form, setForm] = useState({
         email: "",
+        role: "bidder",
         password: "",
         confirmPassword: "",
         name: "",
@@ -68,16 +70,35 @@ const BidderSignup = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+
+    const signup = async (formData) => {
+        try {
+            // Replace with your actual backend URL
+            const response = await axios.post(`${process.env.REACT_APP_ServerUrl}/signup`, formData, {
+                withCredentials: true, // Include credentials if required
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Signup failed:", error.response?.data || error.message);
+            throw new Error("Signup failed! Please try again."); // Throw error for handleSubmit to catch
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            console.log(form); // Display form data in the console
-            toast.success("Signup successful!");
+            try {
+                // Call the signup function with the form data
+                const result = await signup(form);
+                console.log(result); // Log response from the server
+                toast.success("Signup successful!");
+            } catch (error) {
+                toast.error(error.message); // Display error message from signup function
+            }
         } else {
             toast.error("Please fill in all fields correctly.");
         }
     };
-
     return (
         <div className="container-fluid col-7 mt-4 p-3">
             <div className="card shadow border-5 p-2" >
