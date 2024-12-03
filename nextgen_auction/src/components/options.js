@@ -3,7 +3,6 @@ import React from 'react';
 const NavbarWithHover = () => {
     const menuItems = [
         { label: 'Active Auctions', icon: '🔨' },
-        { label: 'Conniidengudham', icon: '🔄' },
         { label: 'Results of Auction', icon: '👍' },
         { label: 'Auctions By Value', icon: '₹' },
         { label: 'Auctions By Org', icon: '🏢' },

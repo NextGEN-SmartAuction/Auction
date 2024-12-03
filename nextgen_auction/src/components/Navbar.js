@@ -1,148 +1,92 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { NavLink } from 'react-router-dom';  // Import NavLink for routing
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setIsLoggedIn(true);
-      setUserDetails(user);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  const handleLogin = () => {
-    const user = { name: "John Doe", email: "johndoe@example.com" };
-    localStorage.setItem('user', JSON.stringify(user));
-    setIsLoggedIn(true);
-    setUserDetails(user);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setUserDetails(null);
-  };
-
-  return (
-    <nav style={styles.navbar}>
-      <div style={styles.logoContainer}>
-        <img
-          src="https://media.licdn.com/dms/image/D5612AQEglNXFBaW8ow/article-cover_image-shrink_720_1280/0/1693372240579?e=2147483647&v=beta&t=_JDNHUoa9vfM8_1zinTiCC_c7wP-7d7jVCRyPgGxXVI"
-          alt="Logo"
-          style={styles.logo}
-        />
-        <h1 style={styles.title}>NextGen_Auction</h1>
-      </div>
-      <div style={styles.menu}>
-        <button style={styles.navItem}>Auction Status</button>
-        <button style={styles.navItem}>Auction Search</button>
-        <button style={styles.navItem}>Department Onboarding</button>
-        <button style={styles.navItem}>Bidder Enrollment</button>
-        {isLoggedIn ? (
-          <div style={styles.userSection}>
-            <p style={styles.welcomeText}>Welcome, {userDetails.name}</p>
-            <button onClick={handleLogout} style={styles.logoutButton}>
-              Logout
-            </button>
-          </div>
-        ) : (
-          <button onClick={handleLogin} style={styles.loginButton}>
-            Login
-          </button>
-        )}
-      </div>
-    </nav>
-  );
+    return (
+        <nav style={styles.navbar}>
+            <div style={styles.logoContainer} >
+                <img
+                    src="https://media.licdn.com/dms/image/D5612AQEglNXFBaW8ow/article-cover_image-shrink_720_1280/0/1693372240579?e=2147483647&v=beta&t=_JDNHUoa9vfM8_1zinTiCC_c7wP-7d7jVCRyPgGxXVI"
+                    alt="Logo"
+                    style={styles.logo}
+                />
+                <h1 style={styles.title}>NextGen Auction</h1>
+            </div>
+            <div style={styles.menu}>
+                {/* Use NavLink to handle routing and active state */}
+                <NavLink
+                    to="/SellerOnboarding"
+                    style={({ isActive }) => isActive ? { ...styles.navItem, ...styles.active } : styles.navItem}
+                >
+                    Seller Onboarding
+                </NavLink>
+                <NavLink
+                    to="/BidderOnboarding"
+                    style={({ isActive }) => isActive ? { ...styles.navItem, ...styles.active } : styles.navItem}
+                >
+                    Bidder Onboarding
+                </NavLink>
+                <NavLink
+                    to="/login"
+                    style={({ isActive }) => isActive ? { ...styles.navItem, ...styles.active } : styles.navItem}
+                >
+                    Login
+                </NavLink>
+            </div>
+        </nav>
+    );
 };
 
 const styles = {
-  navbar: {
-    position: 'fixed',
-    top: 0,
-    width: '100%',
-    backgroundColor: '#4B0082',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 20px',
-    color: '#fff',
-    zIndex: 1000,
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-  },
-  logoContainer: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  logo: {
-    width: '50px',
-    height: '50px',
-    marginRight: '10px',
-    borderRadius: '50%',
-    border: '2px solid #fff',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-  },
-  menu: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-  },
-  navItem: {
-    backgroundColor: '#FFD700',
-    color: '#4B0082',
-    border: 'none',
-    padding: '8px 16px',
-    borderRadius: '20px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    transition: 'background-color 0.3s ease',
-  },
-  loginButton: {
-    backgroundColor: '#FF4081',
-    color: '#fff',
-    border: 'none',
-    padding: '8px 16px',
-    borderRadius: '20px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'background-color 0.3s ease',
-  },
-  logoutButton: {
-    backgroundColor: '#FF6347',
-    color: '#fff',
-    border: 'none',
-    padding: '8px 16px',
-    borderRadius: '15px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'background-color 0.3s ease',
-  },
-  userSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  },
-  welcomeText: {
-    fontSize: '14px',
-    color: '#FFD700',
-  },
+    navbar: {
+        width: '100%',
+        backgroundColor: '#4B0082',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '10px 20px',
+        color: '#fff',
+        zIndex: 1000,
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+    },
+    logoContainer: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    logo: {
+        width: '50px',
+        height: '50px',
+        marginRight: '10px',
+        borderRadius: '50%',
+        border: '2px solid #fff',
+    },
+    title: {
+        fontSize: '24px',
+        fontWeight: 'bold',
+    },
+    menu: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '15px',
+    },
+    // Normal state: purple background and yellow text
+    navItem: {
+        backgroundColor: '#4B0082', // Purple background for normal state
+        color: '#FFD700', // Yellow text for normal state
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '20px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease',
+        textDecoration: 'none', // Remove underline from links
+    },
+    // Active state: yellow background and purple text
+    active: {
+        backgroundColor: '#FFD700', // Yellow background for active state
+        color: '#4B0082', // Purple text for active state
+    },
 };
-
-// Add hover effects
-Object.keys(styles).forEach((key) => {
-  if (key.includes('navItem') || key.includes('Button')) {
-    styles[key]['&:hover'] = {
-      backgroundColor: '#4B0082',
-      color: '#FFD700',
-    };
-  }
-});
 
 export default Navbar;

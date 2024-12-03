@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from 'axios';
+
 
 const SellerOnboarding = () => {
     const [form, setForm] = useState({
+        UserName:"",
         email: "",
         password: "",
         confirmPassword: "",
@@ -18,9 +21,12 @@ const SellerOnboarding = () => {
             pincode: "",
             location: "",
         },
-        logo: null,
         caption: "",
+        role: "seller",
+        logo: "",  // Store only the logo file name here
     });
+
+    const [logoFile, setLogoFile] = useState(null);
 
 
 
@@ -32,12 +38,15 @@ const SellerOnboarding = () => {
     });
 
     const totalSteps = 4;
-    const countries = ["India", "USA", "Canada"]; // Example countries
+    const countries = ["India", "USA", "Canada", "Australia", "Germany"]; // Updated list of countries
     const states = {
-        India: ["Delhi", "Mumbai", "Bangalore"],
-        USA: ["California", "Texas", "New York"],
-        Canada: ["Ontario", "Quebec", "British Columbia"],
+        India: ["Delhi", "Maharastra", "Karnataka", "Telangana", "Kolkata", "Chennai", "Lucknow", "Andhra Pradesh", "Kerala", "Punjab", "Uttar Pradesh", "Rajasthan"],
+        USA: ["California", "Texas", "New York", "Florida", "Illinois", "Ohio", "Michigan"],
+        Canada: ["Ontario", "Quebec", "British Columbia", "Alberta", "Nova Scotia", "Manitoba", "Saskatchewan"],
+        Australia: ["New South Wales", "Victoria", "Queensland", "Western Australia", "South Australia", "Tasmania", "Australian Capital Territory"],
+        Germany: ["Bavaria", "Berlin", "North Rhine-Westphalia", "Hamburg", "Hesse", "Baden-Württemberg", "Saxony"]
     };
+
 
 
 
@@ -45,14 +54,18 @@ const SellerOnboarding = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
+        setForm((prev) => ({ ...prev, [name]: value }));
+        console.log("Updated form:", form);
     };
+    
+
 
     const handleFileChange = (e) => {
-        const { name } = e.target;
-        setForm({ ...form, [name]: e.target.files[0] });
+        const { name, files } = e.target;
+        setLogoFile(files[0]);  // Store the actual file in the logoFile state
+        setForm({ ...form, [name]: files[0].name });  // Store only the file name in the form state
     };
-
+   
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, address: { ...form.address, [name]: value } });
@@ -72,7 +85,11 @@ const SellerOnboarding = () => {
                     form.address.pincode
                 );
             case 4:
-                return form.logo && form.caption;
+                return (
+                    verificationStatus.emailVerified &&
+                    verificationStatus.mobileVerified &&
+                    verificationStatus.secondaryMobileVerified
+                );
             default:
                 return false;
         }
@@ -95,10 +112,72 @@ const SellerOnboarding = () => {
         setStep(step - 1);
     };
 
-    const handleSubmit = (e) => {
+    const uploadLogo = async (file, userName) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("username", userName); // Use userName from form
+        formData.append("foldername", "logo"); // Static folder name for logos
+    
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_ServerUrl}/upload`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
+            });
+            return response.data; // Returns uploaded file details
+        } catch (error) {
+            console.error("Failed to upload logo:", error);
+            throw new Error("Failed to upload logo!");
+        }
+    };
+    
+    
+
+    
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Final Form Data:", form);
-        toast.success("Form submitted successfully!",verificationStatus);
+    
+        try {
+            // Extract UserName from form data
+            const userName = form.UserName; // Access UserName directly from the form object
+            console.log("UserName:", userName);
+    
+            // Check if userName exists
+            if (!userName) {
+                toast.error("UserName is required!");
+                return;
+            }
+    
+            // First, upload the logo file if provided
+            if (logoFile) {
+                const uploadResponse = await uploadLogo(logoFile, userName);
+                form.logo = uploadResponse.file.filename; // Save uploaded logo file name in the form
+            }
+    
+            console.log("Final form data:", form);
+    
+            // Submit the form data
+            const signupResponse = await signup(form);
+            console.log("Signup successful:", signupResponse);
+            toast.success("Form submitted successfully!");
+        } catch (error) {
+            console.error("Error in form submission:", error);
+            toast.error("Form submission failed!");
+        }
+    };
+    
+    
+    
+    
+    const signup = async (formData) => {
+        try {
+            // Replace the URL with your actual endpoint for user registration
+            const response = await axios.post(`${process.env.REACT_APP_ServerUrl}/signup`, formData, {
+                withCredentials: true  // Include credentials if needed
+            });
+            return response.data;  // Return response data from the API
+        } catch (error) {
+            throw new Error("Signup failed!");  // Propagate error if the request fails
+        }
     };
     const handleStepChange = (targetStep) => {
         if (targetStep < step || validateStep()) {
@@ -219,6 +298,18 @@ const SellerOnboarding = () => {
                     {step === 1 && (
                         <>
                             <h4>Login Details</h4>
+                            <div className="mb-3">
+                                <label>UserName</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="UserName" 
+                                    value={form.UserName}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                            </div>
                             <div className="mb-3">
                                 <label>Email</label>
                                 <input

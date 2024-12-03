@@ -7,18 +7,15 @@ import Navbar from './components/Navbar';
 import SellerOnboarding from './components/seller/SellerOnboarding';
 import BidderOnboarding from './components/bidder/BidderOnboarding';
 import AddProduct from "./components/seller/AddProduct";
-import NavbarWithHover from './components/options';
 
 function App() {
     return (
         <Router>
-            <Hero/>
-            <NavbarWithHover/>
             <div>
                 <Navbar />
                 <main>
                     <Routes>
-                        <Route path="/" element={<Home />} />
+                        <Route path="/" element={<Hero />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/SellerOnboarding" element={<SellerOnboarding/>} />
                         <Route path="/BidderOnboarding" element={<BidderOnboarding/>} />

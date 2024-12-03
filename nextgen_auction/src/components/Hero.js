@@ -60,6 +60,7 @@ const Hero = () => {
                             height: "100%",
                             objectFit: "cover",
                         }}
+                        className="mt-3 p-2"
                     />
                 ))}
             </div>
