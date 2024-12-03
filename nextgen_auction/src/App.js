@@ -4,7 +4,12 @@ import Hero from './components/Hero';
 import Home from './components/Home';
 import Login from './components/Login';
 import Navbar from './components/Navbar';
+<<<<<<< Updated upstream
 import NavbarWithHover from './components/options';
+=======
+import SellerOnboarding from './components/seller/SellerOnboarding';
+import BidderOnboarding from './components/bidder/BidderOnboarding';
+>>>>>>> Stashed changes
 import AddProduct from "./components/seller/AddProduct";
 import SellerOnboarding from './components/seller/SellerOnboarding';
 
@@ -20,6 +25,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/SellerOnboarding" element={<SellerOnboarding/>} />
+                        <Route path="/BidderOnboarding" element={<BidderOnboarding/>} />
                         <Route path="/AddProduct" element={<AddProduct />}/>
                     </Routes>
                 </main>

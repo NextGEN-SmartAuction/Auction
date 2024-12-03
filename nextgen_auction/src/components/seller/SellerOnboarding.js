@@ -1,713 +1,16 @@
-// // import React, { useState } from "react";
-
-// // const SellerOnboarding = () => {
-// //     const [form, setForm] = useState({
-// //         email: "",
-// //         password: "",
-// //         confirmPassword: "",
-// //         verifyEmail: false,
-// //         verifyPhone: false,
-// //         sellerName: "",
-// //         displayName: "",
-// //         orgName: "",
-// //         website: "",
-// //         secondPhone: "",
-// //         address: {
-// //             country: "",
-// //             state: "",
-// //             city: "",
-// //             pincode: "",
-// //             location: "",
-// //         },
-// //         logo: null,
-// //         caption: "",
-// //         license: null,
-// //         aadhaar: null,
-// //         pan: null,
-// //     });
-
-// //     const handleInputChange = (e) => {
-// //         const { name, value } = e.target;
-// //         setForm({ ...form, [name]: value });
-// //     };
-
-// //     const handleFileChange = (e) => {
-// //         const { name } = e.target;
-// //         setForm({ ...form, [name]: e.target.files[0] });
-// //     };
-
-// //     const handleAddressChange = (e) => {
-// //         const { name, value } = e.target;
-// //         setForm({ ...form, address: { ...form.address, [name]: value } });
-// //     };
-
-// //     const handleSubmit = (e) => {
-// //         e.preventDefault();
-// //         console.log("Form submitted:", form);
-// //     };
-
-// //     const handleReset = () => {
-// //         setForm({
-// //             email: "",
-// //             password: "",
-// //             confirmPassword: "",
-// //             verifyEmail: false,
-// //             verifyPhone: false,
-// //             sellerName: "",
-// //             displayName: "",
-// //             orgName: "",
-// //             website: "",
-// //             secondPhone: "",
-// //             address: {
-// //                 country: "",
-// //                 state: "",
-// //                 city: "",
-// //                 pincode: "",
-// //                 location: "",
-// //             },
-// //             logo: null,
-// //             caption: "",
-// //             license: null,
-// //             aadhaar: null,
-// //             pan: null,
-// //         });
-// //     };
-
-// //     return (
-// //         <div className="container mt-5">
-// //             <h2 className="text-center mb-4">Seller Signup</h2>
-// //             <form onSubmit={handleSubmit}>
-// //                 {/* Login Details */}
-// //                 <div className="card p-4 mb-4">
-// //                     <h4>Seller Login Details</h4>
-// //                     <div className="row">
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Email</label>
-// //                             <input
-// //                                 type="email"
-// //                                 className="form-control"
-// //                                 name="email"
-// //                                 value={form.email}
-// //                                 onChange={handleInputChange}
-// //                                 required
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Password</label>
-// //                             <input
-// //                                 type="password"
-// //                                 className="form-control"
-// //                                 name="password"
-// //                                 value={form.password}
-// //                                 onChange={handleInputChange}
-// //                                 required
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Confirm Password</label>
-// //                             <input
-// //                                 type="password"
-// //                                 className="form-control"
-// //                                 name="confirmPassword"
-// //                                 value={form.confirmPassword}
-// //                                 onChange={handleInputChange}
-// //                                 required
-// //                             />
-// //                         </div>
-// //                     </div>
-// //                 </div>
-
-// //                 {/* Seller Details */}
-// //                 <div className="card p-4 mb-4">
-// //                     <h4>Seller Details</h4>
-// //                     <div className="row">
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Seller Name</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="sellerName"
-// //                                 value={form.sellerName}
-// //                                 onChange={handleInputChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Display Name</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="displayName"
-// //                                 value={form.displayName}
-// //                                 onChange={handleInputChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Organization Name</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="orgName"
-// //                                 value={form.orgName}
-// //                                 onChange={handleInputChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Website</label>
-// //                             <input
-// //                                 type="url"
-// //                                 className="form-control"
-// //                                 name="website"
-// //                                 value={form.website}
-// //                                 onChange={handleInputChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Second Phone Number</label>
-// //                             <input
-// //                                 type="tel"
-// //                                 className="form-control"
-// //                                 name="secondPhone"
-// //                                 value={form.secondPhone}
-// //                                 onChange={handleInputChange}
-// //                             />
-// //                         </div>
-// //                     </div>
-// //                 </div>
-
-// //                 {/* Address Section */}
-// //                 <div className="card p-4 mb-4">
-// //                     <h4>Address Details</h4>
-// //                     <div className="row">
-// //                         <div className="col-md-4 mb-3">
-// //                             <label>Country</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="country"
-// //                                 value={form.address.country}
-// //                                 onChange={handleAddressChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-4 mb-3">
-// //                             <label>State</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="state"
-// //                                 value={form.address.state}
-// //                                 onChange={handleAddressChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-4 mb-3">
-// //                             <label>City</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="city"
-// //                                 value={form.address.city}
-// //                                 onChange={handleAddressChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Pincode</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="pincode"
-// //                                 value={form.address.pincode}
-// //                                 onChange={handleAddressChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Location</label>
-// //                             <input
-// //                                 type="text"
-// //                                 className="form-control"
-// //                                 name="location"
-// //                                 value={form.address.location}
-// //                                 onChange={handleAddressChange}
-// //                             />
-// //                         </div>
-// //                     </div>
-// //                 </div>
-
-// //                 {/* Document Upload Section */}
-// //                 <div className="card p-4 mb-4">
-// //                     <h4>Documents</h4>
-// //                     <div className="row">
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Seller Logo</label>
-// //                             <input
-// //                                 type="file"
-// //                                 className="form-control"
-// //                                 name="logo"
-// //                                 onChange={handleFileChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Caption/Description</label>
-// //                             <textarea
-// //                                 className="form-control"
-// //                                 name="caption"
-// //                                 value={form.caption}
-// //                                 onChange={handleInputChange}
-// //                             ></textarea>
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Seller License</label>
-// //                             <input
-// //                                 type="file"
-// //                                 className="form-control"
-// //                                 name="license"
-// //                                 onChange={handleFileChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>Aadhaar</label>
-// //                             <input
-// //                                 type="file"
-// //                                 className="form-control"
-// //                                 name="aadhaar"
-// //                                 onChange={handleFileChange}
-// //                             />
-// //                         </div>
-// //                         <div className="col-md-6 mb-3">
-// //                             <label>PAN Card</label>
-// //                             <input
-// //                                 type="file"
-// //                                 className="form-control"
-// //                                 name="pan"
-// //                                 onChange={handleFileChange}
-// //                             />
-// //                         </div>
-// //                     </div>
-// //                 </div>
-
-// //                 {/* Buttons */}
-// //                 <div className="text-center">
-// //                     <button type="submit" className="btn btn-primary me-2">
-// //                         Save
-// //                     </button>
-// //                     <button type="button" className="btn btn-secondary" onClick={handleReset}>
-// //                         Reset
-// //                     </button>
-// //                 </div>
-// //             </form>
-// //         </div>
-// //     );
-// // };
-
-// // export default SellerOnboarding;
-
-
-
-
-// import React, { useState } from "react";
-
-// const SellerOnboarding = () => {
-//     const [form, setForm] = useState({
-//         email: "",
-//         password: "",
-//         confirmPassword: "",
-//         verifyEmail: false,
-//         verifyPhone: false,
-//         sellerName: "",
-//         displayName: "",
-//         orgName: "",
-//         website: "",
-//         secondPhone: "",
-//         address: {
-//             country: "",
-//             state: "",
-//             city: "",
-//             pincode: "",
-//             location: "",
-//         },
-//         logo: null,
-//         caption: "",
-//         license: null,
-//         aadhaar: null,
-//         pan: null,
-//     });
-
-//     const handleInputChange = (e) => {
-//         const { name, value } = e.target;
-//         setForm({ ...form, [name]: value });
-//     };
-
-//     const handleFileChange = (e) => {
-//         const { name } = e.target;
-//         setForm({ ...form, [name]: e.target.files[0] });
-//     };
-
-//     const handleAddressChange = (e) => {
-//         const { name, value } = e.target;
-//         setForm({ ...form, address: { ...form.address, [name]: value } });
-//     };
-
-//     const handleSubmit = (e) => {
-//         e.preventDefault();
-//         console.log("Form submitted:", form);
-//     };
-
-//     const handleReset = () => {
-//         setForm({
-//             email: "",
-//             password: "",
-//             confirmPassword: "",
-//             verifyEmail: false,
-//             verifyPhone: false,
-//             sellerName: "",
-//             displayName: "",
-//             orgName: "",
-//             website: "",
-//             secondPhone: "",
-//             address: {
-//                 country: "",
-//                 state: "",
-//                 city: "",
-//                 pincode: "",
-//                 location: "",
-//             },
-//             logo: null,
-//             caption: "",
-//             license: null,
-//             aadhaar: null,
-//             pan: null,
-//         });
-//     };
-
-//     return (
-//         <div className="seller-register-container mt-5">
-//             <h2 className="text-center mb-4">Seller Signup</h2>
-//             <form onSubmit={handleSubmit} className="onboarding-form">
-                
-//                 {/* Seller Login Details */}
-//                 <div className="card p-4 mb-4 shadow-sm">
-//                     <h4 className="mb-3">Seller Login Details</h4>
-//                     <div className="row">
-//                         <div className="col-md-4 mb-3">
-//                             <label>Email</label>
-//                             <input
-//                                 type="email"
-//                                 className="form-control"
-//                                 name="email"
-//                                 value={form.email}
-//                                 onChange={handleInputChange}
-//                                 required
-//                                 placeholder="Enter your email"
-//                             />
-//                         </div>
-//                         <div className="col-md-4 mb-3">
-//                             <label>Password</label>
-//                             <input
-//                                 type="password"
-//                                 className="form-control"
-//                                 name="password"
-//                                 value={form.password}
-//                                 onChange={handleInputChange}
-//                                 required
-//                                 placeholder="Enter your password"
-//                             />
-//                         </div>
-//                         <div className="col-md-4 mb-3">
-//                             <label>Confirm Password</label>
-//                             <input
-//                                 type="password"
-//                                 className="form-control"
-//                                 name="confirmPassword"
-//                                 value={form.confirmPassword}
-//                                 onChange={handleInputChange}
-//                                 required
-//                                 placeholder="Confirm your password"
-//                             />
-//                         </div>
-//                     </div>
-//                 </div>
-
-//                 {/* Seller Details */}
-//                 <div className="card p-4 mb-4 shadow-sm">
-//                     <h4 className="mb-3">Seller Details</h4>
-//                     <div className="row">
-//                         <div className="col-md-6 mb-3">
-//                             <label>Seller Name</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="sellerName"
-//                                 value={form.sellerName}
-//                                 onChange={handleInputChange}
-//                                 placeholder="Enter your full name"
-//                             />
-//                         </div>
-//                         <div className="col-md-6 mb-3">
-//                             <label>Display Name</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="displayName"
-//                                 value={form.displayName}
-//                                 onChange={handleInputChange}
-//                                 placeholder="Enter your display name"
-//                             />
-//                         </div>
-//                         <div className="col-md-6 mb-3">
-//                             <label>Organization Name</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="orgName"
-//                                 value={form.orgName}
-//                                 onChange={handleInputChange}
-//                                 placeholder="Enter organization name"
-//                             />
-//                         </div>
-//                         <div className="col-md-6 mb-3">
-//                             <label>Website</label>
-//                             <input
-//                                 type="url"
-//                                 className="form-control"
-//                                 name="website"
-//                                 value={form.website}
-//                                 onChange={handleInputChange}
-//                                 placeholder="https://yourwebsite.com"
-//                             />
-//                         </div>
-//                         <div className="col-md-6 mb-3">
-//                             <label>Second Phone Number</label>
-//                             <input
-//                                 type="tel"
-//                                 className="form-control"
-//                                 name="secondPhone"
-//                                 value={form.secondPhone}
-//                                 onChange={handleInputChange}
-//                                 placeholder="Enter another phone number"
-//                             />
-//                         </div>
-//                     </div>
-
-//                     {/* Address */}
-//                     <h5 className="mt-4">Address</h5>
-//                     <div className="row">
-//                         <div className="col-md-4 mb-3">
-//                             <label>Country</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="country"
-//                                 value={form.address.country}
-//                                 onChange={handleAddressChange}
-//                                 placeholder="Country"
-//                             />
-//                         </div>
-//                         <div className="col-md-4 mb-3">
-//                             <label>State</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="state"
-//                                 value={form.address.state}
-//                                 onChange={handleAddressChange}
-//                                 placeholder="State"
-//                             />
-//                         </div>
-//                         <div className="col-md-4 mb-3">
-//                             <label>City</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="city"
-//                                 value={form.address.city}
-//                                 onChange={handleAddressChange}
-//                                 placeholder="City"
-//                             />
-//                         </div>
-//                         <div className="col-md-6 mb-3">
-//                             <label>Pincode</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="pincode"
-//                                 value={form.address.pincode}
-//                                 onChange={handleAddressChange}
-//                                 placeholder="Pincode"
-//                             />
-//                         </div>
-//                         <div className="col-md-6 mb-3">
-//                             <label>Location</label>
-//                             <input
-//                                 type="text"
-//                                 className="form-control"
-//                                 name="location"
-//                                 value={form.address.location}
-//                                 onChange={handleAddressChange}
-//                                 placeholder="Specific location"
-//                             />
-//                         </div>
-//                     </div>
-
-//                     {/* File Uploads */}
-//                     <h5 className="mt-4">Documents</h5>
-//                     <div className="row">
-//                         <div className="col-md-6 mb-3">
-//                             <label>Seller Logo</label>
-//                             <input
-//                                 type="file"
-//                                 className="form-control"
-//                                 name="logo"
-//                                 onChange={handleFileChange}
-//                             />
-//                         </div>
-//                         <div className="col-md-6 mb-3">
-//                             <label>Caption/Description</label>
-//                             <textarea
-//                                 className="form-control"
-//                                 name="caption"
-//                                 value={form.caption}
-//                                 onChange={handleInputChange}
-//                                 placeholder="Describe your business or products"
-//                             ></textarea>
-//                         </div>
-//                         <div className="col-md-4 mb-3">
-//                             <label>Seller License</label>
-//                             <input
-//                                 type="file"
-//                                 className="form-control"
-//                                 name="license"
-//                                 onChange={handleFileChange}
-//                             />
-//                         </div>
-//                         <div className="col-md-4 mb-3">
-//                             <label>Aadhaar</label>
-//                             <input
-//                                 type="file"
-//                                 className="form-control"
-//                                 name="aadhaar"
-//                                 onChange={handleFileChange}
-//                             />
-//                         </div>
-//                         <div className="col-md-4 mb-3">
-//                             <label>PAN Card</label>
-//                             <input
-//                                 type="file"
-//                                 className="form-control"
-//                                 name="pan"
-//                                 onChange={handleFileChange}
-//                             />
-//                         </div>
-//                     </div>
-//                 </div>
-
-//                 {/* Action Buttons */}
-//                 <div className="text-center mb-5">
-//                     <button type="submit" className="btn btn-primary me-2">
-//                         Save
-//                     </button>
-//                     <button type="button" className="btn btn-secondary" onClick={handleReset}>
-//                         Reset
-//                     </button>
-//                 </div>
-//             </form>
-
-//             {/* Inline CSS for Better Visual Experience */}
-//             <style jsx>{`
-//                 .seller-register-container {
-//                     max-width: 900px;
-//                     margin: 0 auto;
-//                 }
-
-//                 .card {
-//                     border-radius: 8px;
-//                     padding: 25px;
-//                     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
-//                 }
-
-//                 .form-control {
-//                     border-radius: 5px;
-//                     padding: 12px;
-//                     font-size: 1rem;
-//                     margin-bottom: 12px;
-//                 }
-
-//                 .form-control:focus {
-//                     border-color: #0066cc;
-//                     box-shadow: 0 0 5px rgba(0, 102, 204, 0.5);
-//                 }
-
-//                 label {
-//                     font-weight: 500;
-//                     margin-bottom: 5px;
-//                 }
-
-//                 textarea.form-control {
-//                     resize: vertical;
-//                 }
-
-//                 .btn {
-//                     border-radius: 5px;
-//                     padding: 12px 25px;
-//                     font-size: 1rem;
-//                     transition: all 0.3s ease;
-//                 }
-
-//                 .btn-primary {
-//                     background-color: #0066cc;
-//                     border: none;
-//                 }
-
-//                 .btn-primary:hover {
-//                     background-color: #0057a8;
-//                     cursor: pointer;
-//                 }
-
-//                 .btn-secondary {
-//                     background-color: #f0f0f0;
-//                     border: none;
-//                 }
-
-//                 .btn-secondary:hover {
-//                     background-color: #dcdcdc;
-//                     cursor: pointer;
-//                 }
-
-//                 @media (max-width: 768px) {
-//                     .col-md-4, .col-md-6 {
-//                         flex: 0 0 100%;
-//                         max-width: 100%;
-//                     }
-
-//                     .card {
-//                         padding: 15px;
-//                     }
-
-//                     .form-control {
-//                         font-size: 0.9rem;
-//                     }
-//                 }
-//             `}</style>
-//         </div>
-//     );
-// };
-
-// export default SellerOnboarding;
-
-
-
-
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SellerOnboarding = () => {
     const [form, setForm] = useState({
         email: "",
         password: "",
         confirmPassword: "",
-        verifyEmail: false,
-        verifyPhone: false,
         sellerName: "",
         displayName: "",
         orgName: "",
         website: "",
-        secondPhone: "",
         address: {
             country: "",
             state: "",
@@ -717,10 +20,28 @@ const SellerOnboarding = () => {
         },
         logo: null,
         caption: "",
-        license: null,
-        aadhaar: null,
-        pan: null,
     });
+
+
+
+
+    const [step, setStep] = useState(1);
+    const [showPassword, setShowPassword] = useState({
+        password: false,
+        confirmPassword: false,
+    });
+
+    const totalSteps = 4;
+    const countries = ["India", "USA", "Canada"]; // Example countries
+    const states = {
+        India: ["Delhi", "Mumbai", "Bangalore"],
+        USA: ["California", "Texas", "New York"],
+        Canada: ["Ontario", "Quebec", "British Columbia"],
+    };
+
+
+
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -737,369 +58,492 @@ const SellerOnboarding = () => {
         setForm({ ...form, address: { ...form.address, [name]: value } });
     };
 
+    const validateStep = () => {
+        switch (step) {
+            case 1:
+                return form.email && form.password && form.confirmPassword && form.password === form.confirmPassword
+            case 2:
+                return form.sellerName && form.displayName && form.orgName && form.website && form.logo && form.caption;
+            case 3:
+                return (
+                    form.address.country &&
+                    form.address.state &&
+                    form.address.city &&
+                    form.address.pincode
+                );
+            case 4:
+                return form.logo && form.caption;
+            default:
+                return false;
+        }
+    };
+
+    const handleNext = () => {
+        if (validateStep()) {
+            setStep(step + 1);
+        } else {
+            toast.error("Please complete all fields before proceeding.");
+        }
+        if (step === 1 && form.password !== form.confirmPassword) {
+            toast.error("Passwords do not match!");
+            return;
+        }
+
+    };
+
+    const handlePrev = () => {
+        setStep(step - 1);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Form submitted:", form);
+        console.log("Final Form Data:", form);
+        toast.success("Form submitted successfully!",verificationStatus);
+    };
+    const handleStepChange = (targetStep) => {
+        if (targetStep < step || validateStep()) {
+            setStep(targetStep);
+        } else {
+            toast.error("Please complete the current step before proceeding.");
+        }
     };
 
-    const handleReset = () => {
-        setForm({
-            email: "",
-            password: "",
-            confirmPassword: "",
-            verifyEmail: false,
-            verifyPhone: false,
-            sellerName: "",
-            displayName: "",
-            orgName: "",
-            website: "",
-            secondPhone: "",
-            address: {
-                country: "",
-                state: "",
-                city: "",
-                pincode: "",
-                location: "",
-            },
-            logo: null,
-            caption: "",
-            license: null,
-            aadhaar: null,
-            pan: null,
-        });
+
+
+    const [verificationStatus, setVerificationStatus] = useState({
+        emailVerified: false,
+        mobileVerified: false,
+        secondaryMobileVerified: false,
+    });
+
+    const handleVerification = async () => {
+        // Simulate sending verification requests to email and mobile numbers.
+
+        // Check if all fields are filled
+        if (!form.email || !form.primaryMobile) {
+            toast.error("Please provide both email and primary mobile number.");
+            return;
+        }
+
+        // Simulate sending email verification
+        try {
+            // This would be an API call to your backend to send an email verification link
+            console.log("Sending email verification to:", form.email);
+            // Simulate delay
+            setTimeout(() => {
+                setVerificationStatus(prev => ({
+                    ...prev,
+                    emailVerified: true,
+                }));
+                toast.success("Email verification sent!");
+            }, 1000);
+        } catch (error) {
+            console.error("Error sending email verification:", error);
+            toast.error("Failed to send email verification.");
+        }
+
+        // Simulate sending mobile number verification (primary)
+        try {
+            // This would be an API call to send an OTP to the primary mobile number
+            console.log("Sending OTP to primary mobile number:", form.primaryMobile);
+            // Simulate delay
+            setTimeout(() => {
+                setVerificationStatus(prev => ({
+                    ...prev,
+                    mobileVerified: true,
+                }));
+                toast.success("OTP sent to primary mobile number!");
+            }, 1000);
+        } catch (error) {
+            console.error("Error sending mobile verification:", error);
+            toast.error("Failed to send mobile number verification.");
+        }
+
+        // Simulate sending secondary mobile verification (if entered)
+        if (form.secondaryMobile) {
+            try {
+                // This would be an API call to send an OTP to the secondary mobile number
+                console.log("Sending OTP to secondary mobile number:", form.secondaryMobile);
+                // Simulate delay
+                setTimeout(() => {
+                    setVerificationStatus(prev => ({
+                        ...prev,
+                        secondaryMobileVerified: true,
+                    }));
+                    toast.success("OTP sent to secondary mobile number!");
+                }, 1000);
+            } catch (error) {
+                console.error("Error sending secondary mobile verification:", error);
+                toast.error("Failed to send secondary mobile verification.");
+            }
+        }
     };
+
+
+
 
     return (
-        <div className="seller-register-container mt-5">
-            <h2 className="text-center mb-4">Seller Signup</h2>
-            <form onSubmit={handleSubmit} className="onboarding-form">
-                
-                {/* Seller Login Details */}
-                <div className="card p-4 mb-4 shadow-lg">
-                    <h4 className="mb-3">Seller Login Details</h4>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <label>Email</label>
-                            <input
-                                type="email"
-                                className="form-control"
-                                name="email"
-                                value={form.email}
-                                onChange={handleInputChange}
-                                required
-                                placeholder="Enter your email"
-                            />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label>Password</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                name="password"
-                                value={form.password}
-                                onChange={handleInputChange}
-                                required
-                                placeholder="Enter your password"
-                            />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label>Confirm Password</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                name="confirmPassword"
-                                value={form.confirmPassword}
-                                onChange={handleInputChange}
-                                required
-                                placeholder="Confirm your password"
-                            />
-                        </div>
-                    </div>
+        <div className="container col-6 mt-5">
+            <h2 className="text-center mb-4">Seller Onboarding</h2>
+
+            {/* Progress Bar */}
+            <div className="progress mb-4" style={{ height: "30px" }}>
+                <div
+                    className="progress-bar progress-bar-striped"
+                    role="progressbar"
+                    style={{ width: `${(step / totalSteps) * 100}%` }}
+                    aria-valuenow={step}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                >
+                    <strong>Step {step} of {totalSteps}</strong>
                 </div>
+            </div>
 
-                {/* Seller Details */}
-                <div className="card p-4 mb-4 shadow-lg">
-                    <h4 className="mb-3">Seller Details</h4>
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <label>Seller Name</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="sellerName"
-                                value={form.sellerName}
-                                onChange={handleInputChange}
-                                placeholder="Enter your full name"
-                            />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label>Display Name</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="displayName"
-                                value={form.displayName}
-                                onChange={handleInputChange}
-                                placeholder="Enter your display name"
-                            />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label>Organization Name</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="orgName"
-                                value={form.orgName}
-                                onChange={handleInputChange}
-                                placeholder="Enter organization name"
-                            />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label>Website</label>
-                            <input
-                                type="url"
-                                className="form-control"
-                                name="website"
-                                value={form.website}
-                                onChange={handleInputChange}
-                                placeholder="https://yourwebsite.com"
-                            />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label>Second Phone Number</label>
-                            <input
-                                type="tel"
-                                className="form-control"
-                                name="secondPhone"
-                                value={form.secondPhone}
-                                onChange={handleInputChange}
-                                placeholder="Enter another phone number"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Address */}
-                    <h5 className="mt-4">Address</h5>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <label>Country</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="country"
-                                value={form.address.country}
-                                onChange={handleAddressChange}
-                                placeholder="Country"
-                            />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label>State</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="state"
-                                value={form.address.state}
-                                onChange={handleAddressChange}
-                                placeholder="State"
-                            />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label>City</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="city"
-                                value={form.address.city}
-                                onChange={handleAddressChange}
-                                placeholder="City"
-                            />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label>Pincode</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="pincode"
-                                value={form.address.pincode}
-                                onChange={handleAddressChange}
-                                placeholder="Pincode"
-                            />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label>Location</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="location"
-                                value={form.address.location}
-                                onChange={handleAddressChange}
-                                placeholder="Specific location"
-                            />
-                        </div>
-                    </div>
-
-                    {/* File Uploads */}
-                    <h5 className="mt-4">Documents</h5>
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <label>Seller Logo</label>
-                            <input
-                                type="file"
-                                className="form-control"
-                                name="logo"
-                                onChange={handleFileChange}
-                            />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label>Caption/Description</label>
-                            <textarea
-                                className="form-control"
-                                name="caption"
-                                value={form.caption}
-                                onChange={handleInputChange}
-                                placeholder="Describe your business or products"
-                            ></textarea>
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label>Seller License</label>
-                            <input
-                                type="file"
-                                className="form-control"
-                                name="license"
-                                onChange={handleFileChange}
-                            />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label>Aadhaar</label>
-                            <input
-                                type="file"
-                                className="form-control"
-                                name="aadhaar"
-                                onChange={handleFileChange}
-                            />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label>PAN Card</label>
-                            <input
-                                type="file"
-                                className="form-control"
-                                name="pan"
-                                onChange={handleFileChange}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="text-center mb-5">
-                    <button type="submit" className="btn btn-primary me-2">
-                        Save
+            {/* Button Group Navigation */}
+            <div className="btn-group mb-4 w-100">
+                {["Login", "Details", "Address", "Info"].map((label, index) => (
+                    <button
+                        key={index}
+                        className={`btn btn-${step === index + 1 ? "primary" : "secondary"}`}
+                        onClick={() => handleStepChange(index + 1)}
+                        disabled={index + 1 > step && !validateStep()} // Disable if skipping ahead without validation
+                    >
+                        {label}
                     </button>
-                    <button type="button" className="btn btn-secondary" onClick={handleReset}>
-                        Reset
-                    </button>
-                </div>
-            </form>
+                ))}
+            </div>
 
-            {/* Enhanced Inline CSS for Better Visual Experience */}
-            <style jsx>{`
-                .seller-register-container {
-                    max-width: 900px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background: #f9f9f9;
-                    border-radius: 8px;
-                    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-                }
+            <div className="card p-4 shadow-lg">
+                <form onSubmit={handleSubmit}>
+                    {step === 1 && (
+                        <>
+                            <h4>Login Details</h4>
+                            <div className="mb-3">
+                                <label>Email</label>
+                                <input
+                                    type="email"
+                                    className="form-control"
+                                    name="email"
+                                    value={form.email}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Password</label>
+                                <div className="input-group">
+                                    <input
+                                        type={showPassword.password ? "text" : "password"}
+                                        className="form-control"
+                                        name="password"
+                                        value={form.password}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary"
+                                        onClick={() =>
+                                            setShowPassword({
+                                                ...showPassword,
+                                                password: !showPassword.password,
+                                            })
+                                        }
+                                    >
+                                        {showPassword.password ? "Hide" : "Show"}
+                                    </button>
+                                </div>
+                            </div>
 
-                .card {
-                    border-radius: 10px;
-                    padding: 25px;
-                    background-color: #fff;
-                    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
-                }
+                            <div className="mb-3">
+                                <label>Confirm Password</label>
+                                <div className="input-group">
+                                    <input
+                                        type={showPassword.confirmPassword ? "text" : "password"}
+                                        className="form-control"
+                                        name="confirmPassword"
+                                        value={form.confirmPassword}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary"
+                                        onClick={() =>
+                                            setShowPassword({
+                                                ...showPassword,
+                                                confirmPassword: !showPassword.confirmPassword,
+                                            })
+                                        }
+                                    >
+                                        {showPassword.confirmPassword ? "Hide" : "Show"}
+                                    </button>
+                                </div>
+                            </div>
 
-                .card h4 {
-                    font-size: 1.25rem;
-                    font-weight: 600;
-                    color: #333;
-                }
+                        </>
+                    )}
 
-                .form-control {
-                    border-radius: 8px;
-                    padding: 12px 15px;
-                    font-size: 1rem;
-                    margin-bottom: 15px;
-                    background-color: #f8f8f8;
-                    border: 1px solid #ddd;
-                }
+                    {step === 2 && (
+                        <>
+                            <h4>Seller Details</h4>
+                            <div className="mb-3">
+                                <label>Seller Name</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="sellerName"
+                                    value={form.sellerName}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Display Name</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="displayName"
+                                    value={form.displayName}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Organization Name</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="orgName"
+                                    value={form.orgName}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Website</label>
+                                <input
+                                    type="url"
+                                    className="form-control"
+                                    name="website"
+                                    value={form.website}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Logo</label>
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    name="logo"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Caption</label>
+                                <textarea
+                                    className="form-control"
+                                    name="caption"
+                                    value={form.caption}
+                                    onChange={handleInputChange}
+                                    rows="3"
+                                    required
+                                ></textarea>
+                            </div>
+                        </>
+                    )}
 
-                .form-control:focus {
-                    border-color: #0066cc;
-                    box-shadow: 0 0 5px rgba(0, 102, 204, 0.5);
-                }
 
-                label {
-                    font-weight: 600;
-                    color: #333;
-                    margin-bottom: 5px;
-                }
 
-                textarea.form-control {
-                    resize: vertical;
-                }
+                    {step === 3 && (
+                        <>
+                            <h4>Seller Address</h4>
+                            <div className="mb-3">
+                                <label>Country</label>
+                                <select
+                                    className="form-control"
+                                    name="country"
+                                    value={form.address.country}
+                                    onChange={handleAddressChange}
+                                    required
+                                >
+                                    <option value="">Select Country</option>
+                                    {countries.map((country) => (
+                                        <option key={country} value={country}>
+                                            {country}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="mb-3">
+                                <label>State</label>
+                                <select
+                                    className="form-control"
+                                    name="state"
+                                    value={form.address.state}
+                                    onChange={handleAddressChange}
+                                    required
+                                >
+                                    <option value="">Select State</option>
+                                    {(states[form.address.country] || []).map((state) => (
+                                        <option key={state} value={state}>
+                                            {state}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="mb-3">
+                                <label>City</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="city"
+                                    value={form.address.city}
+                                    onChange={handleAddressChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Pincode</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="pincode"
+                                    value={form.address.pincode}
+                                    onChange={handleAddressChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label>Location</label>
+                                <textarea
+                                    className="form-control"
+                                    name="location"
+                                    value={form.address.location}
+                                    onChange={handleAddressChange}
+                                    rows="3"
+                                    required
+                                ></textarea>
+                            </div>
+                        </>
+                    )}
 
-                .btn {
-                    border-radius: 8px;
-                    padding: 12px 25px;
-                    font-size: 1rem;
-                    transition: all 0.3s ease;
-                }
 
-                .btn-primary {
-                    background-color: #0066cc;
-                    color: #fff;
-                    border: none;
-                }
+                    {step === 4 && (
+                        <>
+                            <h4>Mobile and Email Verification</h4>
 
-                .btn-primary:hover {
-                    background-color: #0057a8;
-                    cursor: pointer;
-                }
+                            {/* Email Verification */}
+                            <div className="mb-3">
+                                <label>Email</label>
+                                <input
+                                    type="email"
+                                    className="form-control"
+                                    name="email"
+                                    value={form.email}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                                <small className="form-text text-muted">We'll send a verification link to your email.</small>
+                            </div>
 
-                .btn-secondary {
-                    background-color: #f0f0f0;
-                    border: none;
-                    color: #333;
-                }
+                            {/* Mobile Number Verification */}
+                            <div className="mb-3">
+                                <label>Primary Mobile Number</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="primaryMobile"
+                                    value={form.primaryMobile}
+                                    onChange={handleInputChange}
+                                    required
+                                    pattern="^\+?[0-9]{10,15}$"  // Pattern for validating phone number
+                                    placeholder="Enter your primary mobile number"
+                                />
+                                <small className="form-text text-muted">We'll send a verification code to this number.</small>
+                            </div>
 
-                .btn-secondary:hover {
-                    background-color: #e0e0e0;
-                    cursor: pointer;
-                }
+                            {/* Secondary Mobile Number */}
+                            <div className="mb-3">
+                                <label>Secondary Mobile Number</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="secondaryMobile"
+                                    value={form.secondaryMobile}
+                                    onChange={handleInputChange}
+                                    pattern="^\+?[0-9]{10,15}$"  // Pattern for validating phone number
+                                    placeholder="Enter your secondary mobile number (optional)"
+                                />
+                                <small className="form-text text-muted">Optional - You can provide a backup number.</small>
+                            </div>
 
-                @media (max-width: 768px) {
-                    .col-md-4, .col-md-6 {
-                        flex: 0 0 100%;
-                        max-width: 100%;
-                    }
+                            {/* Button to trigger verification */}
+                            <div className="mb-3">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={handleVerification}
+                                >
+                                    Verify Mobile & Email
+                                </button>
+                            </div>
+                        </>
+                    )}
 
-                    .card {
-                        padding: 15px;
-                    }
 
-                    .form-control {
-                        font-size: 0.9rem;
-                    }
 
-                    .btn {
-                        width: 100%;
-                        padding: 12px;
-                    }
-                }
-            `}</style>
+
+
+
+
+                    {/* Other steps omitted for brevity but follow the same structure */}
+
+                    <div className="d-flex justify-content-between mt-4">
+                        {step > 1 && (
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={handlePrev}
+                            >
+                                Previous
+                            </button>
+                        )}
+                        {step < totalSteps ? (
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handleNext}
+                            >
+                                Next
+                            </button>
+                        ) : (
+                            <button type="submit" className="btn btn-success">
+                                Submit
+                            </button>
+                        )}
+                    </div>
+                </form>
+            </div>
+            <ToastContainer />
         </div>
     );
 };
 
 export default SellerOnboarding;
+
+
+
+
+
+
+
+
+
+
+
+
