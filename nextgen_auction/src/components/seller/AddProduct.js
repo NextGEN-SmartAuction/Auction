@@ -104,7 +104,7 @@ function AddProduct() {
             return;
         }
     
-        // Prepare the form data
+        // Prepare the form data for the first API call
         const formData = {
             username,
             productId, // Assuming you have a unique productId generated somewhere
@@ -132,19 +132,50 @@ function AddProduct() {
         try {
             // Call your backend API to save the product
             const response = await axios.post(`${process.env.REACT_APP_ServerUrl}/addProduct`, formData, {
-                withCredentials: true // Include credentials if needed
+                withCredentials: true, // Include credentials if needed
             });
     
             if (response.status === 200) {
                 toast.success('Product added successfully!');
             } else {
                 toast.error('Failed to add product');
+                return; // Stop further execution if the product is not added successfully
             }
         } catch (error) {
             toast.error('Error adding product');
             console.error('Error:', error);
+            return; // Stop further execution on error
+        }
+    
+        // Prepare the form data for the second API call (image upload)
+        const formData1 = new FormData();
+        formData1.append("productData", JSON.stringify(formData));
+        formData1.append("primaryImage", imageList.find((img) => img.name === primaryImage));
+        imageList
+            .filter((img) => img.name !== primaryImage)
+            .forEach((img, index) => {
+                formData1.append(`otherImages${index + 1}`, img);
+            });
+    
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_FlaskUrl}/uploadProductImages`, formData1, {
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+    
+            if (response.status === 200) {
+                toast.success('Product and images uploaded successfully!');
+            } else {
+                toast.error('Failed to upload product and images');
+            }
+        } catch (error) {
+            toast.error('Error uploading product and images');
+            console.error('Error:', error);
         }
     };
+    
     
 
     return (

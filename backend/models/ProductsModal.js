@@ -14,14 +14,6 @@ const productSchema = new mongoose.Schema({
     productStatus: {
         type: String,
         default: 'unsold', // Default value
-    },
-    primaryImage: {
-        type: String,
-        required: true,
-    },
-    otherImages: {
-        type: [String], // Array of image names
-        default: [],
     }
 }, { _id: false }); // Disable _id generation for the product sub-document
 

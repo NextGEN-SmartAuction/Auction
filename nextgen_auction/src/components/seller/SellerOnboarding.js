@@ -23,7 +23,6 @@ const SellerOnboarding = () => {
         },
         caption: "",
         role: "seller",
-        logo: "",  // Store only the logo file name here
     });
 
     const [logoFile, setLogoFile] = useState(null);
@@ -61,9 +60,8 @@ const SellerOnboarding = () => {
 
 
     const handleFileChange = (e) => {
-        const { name, files } = e.target;
+        const {  files } = e.target;
         setLogoFile(files[0]);  // Store the actual file in the logoFile state
-        setForm({ ...form, [name]: files[0].name });  // Store only the file name in the form state
     };
    
     const handleAddressChange = (e) => {
@@ -76,7 +74,7 @@ const SellerOnboarding = () => {
             case 1:
                 return form.email && form.password && form.confirmPassword && form.password === form.confirmPassword
             case 2:
-                return form.sellerName && form.displayName && form.orgName && form.website && form.logo && form.caption;
+                return form.sellerName && form.displayName && form.orgName && form.website  && form.caption;
             case 3:
                 return (
                     form.address.country &&
@@ -116,9 +114,6 @@ const SellerOnboarding = () => {
         const formData = new FormData();
         formData.append("file", file); // The file input from the user
         formData.append("username", userName); // Username of the user
-        formData.append("foldername", "logo"); // Folder name (e.g., 'logo')
-        formData.append("originalName", originalName); // Original name of the file
-    
         console.log("Form Data:", formData);
     
         try {

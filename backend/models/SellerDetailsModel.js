@@ -68,10 +68,6 @@ const sellerDetailsSchema = new mongoose.Schema({
     address: {
         type: addressSchema,
         required: true,
-    },
-    logo: {
-        type: String,  
-        required: true,
     }
 }, { versionKey: false });
 

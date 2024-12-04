@@ -59,14 +59,6 @@ const productDetailsSchema = new mongoose.Schema({
         enum: ['upcoming', 'ongoing', 'completed'], // Restrict to valid statuses
         required: true,
     },
-    primaryImage: {
-        type: String,
-        required: true,
-    },
-    otherImages: {
-        type: [String],
-        default: [], // Default to an empty array
-    },
     winner: {
         type: String,
         default: 'tbd', // Default value

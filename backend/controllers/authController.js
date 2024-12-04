@@ -87,8 +87,7 @@ const signup = async (req, res) => {
                 email: req.body.email,
                 primaryMobile: req.body.primaryMobile,
                 secondaryMobile: req.body.secondaryMobile,
-                address: req.body.address,   // Assuming address is sent in the request body
-                logo: req.body.logo, // Assuming logo is sent in the request body
+                address: req.body.address,   
             });
 
             // Save the seller details
@@ -139,7 +138,7 @@ const signup = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { role, username, productId, auctionStatus, productStatus, primaryImage, otherImages, productDetails } = req.body;
+        const { role, username, productId, auctionStatus, productStatus } = req.body;
 
         // Ensure user exists and has the correct role (seller)
         const user = await UserModel.findOne({ username });
@@ -173,8 +172,6 @@ const addProduct = async (req, res) => {
             description: req.body.description,
             productStatus: productStatus || 'unsold',
             auctionStatus: auctionStatus || 'upcoming',
-            primaryImage,
-            otherImages,
             winner: 'tbd', // Default winner to 'tbd'
         });
 
@@ -186,8 +183,6 @@ const addProduct = async (req, res) => {
             productId,
             auctionStatus: auctionStatus || 'upcoming',
             productStatus: productStatus || 'unsold',
-            primaryImage,
-            otherImages,
         };
 
         const updatedProducts = await ProductsModal.findOneAndUpdate(
