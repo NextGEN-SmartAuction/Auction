@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const SellerDetailsModel = require('../models/SellerDetailsModel');
 const BidderDetailsModel = require('../models/BidderDetailsModel');
+const ProductDetailsModal = require('../models/ProductDetailsModal');
+const ProductsModal = require('../models/ProductsModal');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
@@ -132,6 +134,77 @@ const signup = async (req, res) => {
     }
 };
 
+
+
+
+const addProduct = async (req, res) => {
+    try {
+        const { role, username, productId, auctionStatus, productStatus, primaryImage, otherImages, productDetails } = req.body;
+
+        // Ensure user exists and has the correct role (seller)
+        const user = await UserModel.findOne({ username });
+        if (!user || user.role !== 'seller') {
+            return res.status(400).send('User does not exist or is not a seller.');
+        }
+
+        // Check if the productId already exists in the seller's product list (ProductsModal)
+        const existingProducts = await ProductsModal.findOne({ username });
+        if (existingProducts) {
+            const productExists = existingProducts.products.some(product => product.productId === productId);
+            if (productExists) {
+                return res.status(400).send('Product with this ID already exists.');
+            }
+        }
+       
+
+        // Create a new product in the ProductDetailsModal
+        const newProductDetails = new ProductDetailsModal({
+            productId,
+            noOfParts: req.body.noOfParts || 1, // Default to 1 if not provided
+            category: req.body.category,
+            subCategory: req.body.subCategory,
+            startDateTime: req.body.startDateTime,
+            endDateTime: req.body.endDateTime,
+            auctionDuration: req.body.auctionDuration,
+            priceInterval: req.body.priceInterval,
+            minimumPrice: req.body.minimumPrice,
+            reservedPrice: req.body.reservedPrice,
+            productName: req.body.productName,
+            description: req.body.description,
+            productStatus: productStatus || 'unsold',
+            auctionStatus: auctionStatus || 'upcoming',
+            primaryImage,
+            otherImages,
+            winner: 'tbd', // Default winner to 'tbd'
+        });
+
+        const productDetailsResult = await newProductDetails.save();
+        console.log('Product details saved:', productDetailsResult);
+
+        // If the product details were saved successfully, add the product to the seller's product list (ProductsModal)
+        const product = {
+            productId,
+            auctionStatus: auctionStatus || 'upcoming',
+            productStatus: productStatus || 'unsold',
+            primaryImage,
+            otherImages,
+        };
+
+        const updatedProducts = await ProductsModal.findOneAndUpdate(
+            { username },
+            { $push: { products: product } },
+            { upsert: true, new: true } // Create if not exists, and return the updated document
+        );
+        console.log('Product added to seller\'s product list:', updatedProducts);
+
+        res.status(200).send('Product added successfully.');
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error.');
+    }
+};
+
 const login = async (req, res) => {
     console.log('Received login request:', req.query);
     const { identifier, password } = req.query;
@@ -199,5 +272,6 @@ module.exports = {
     signup,
     login,
     getProfile,
-    getotp
+    getotp,
+    addProduct
 };

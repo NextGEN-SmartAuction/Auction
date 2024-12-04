@@ -94,11 +94,18 @@ const Navbar = () => {
                             Bidder Onboarding
                         </NavLink>
                         <NavLink
+                            to="/signup"
+                            style={({ isActive }) => (isActive ? { ...styles.navItem, ...styles.active } : styles.navItem)}
+                        >
+                            Sign up
+                        </NavLink>
+                        <NavLink
                             to="/login"
                             style={({ isActive }) => (isActive ? { ...styles.navItem, ...styles.active } : styles.navItem)}
                         >
                             Login
                         </NavLink>
+                        
                     </>
                 )}
             </div>

@@ -1,19 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
 
 function AddProduct() {
-    const [numberOfParameters, setNumberOfParameters] = useState(0);
+    const [productId] = useState(`PID-${Date.now()}`); // Generate unique product ID
+    const [noOfParts, setNoOfParts] = useState(1); // Default value for No of Parts
     const [category, setCategory] = useState('');
     const [subCategory, setSubCategory] = useState('');
-    const [productImage, setProductImage] = useState(null);
     const [startDateTime, setStartDateTime] = useState('');
     const [endDateTime, setEndDateTime] = useState('');
     const [priceInterval, setPriceInterval] = useState('');
+    const [minimumPrice, setMinimumPrice] = useState('');
+    const [reservedPrice, setReservedPrice] = useState('');
     const [productName, setProductName] = useState('');
     const [description, setDescription] = useState('');
-    const [minimumPrice, setMinimumPrice] = useState('');
     const [auctionDuration, setAuctionDuration] = useState('');
+    const [primaryImage, setPrimaryImage] = useState('');
+    const [imageList, setImageList] = useState([]);
+    const [productStatus] = useState('unsold'); // Default product status
+    const [auctionStatus, setAuctionStatus] = useState(''); // Dynamically calculated auction status
+    const [username, setUsername] = useState(null);
+
+
+
+
+
+    useEffect(() => {
+        const jwtToken = Cookies.get('jwt');
+        if (jwtToken) {
+            const checkAuthenticationStatus = async () => {
+                try {
+                    const response = await axios.get(
+                        `${process.env.REACT_APP_ServerUrl}/profile`,
+                        { withCredentials: true }
+                    );
+                    const {username } = response.data;
+                    setUsername(username);
+                } catch (error) {
+                    console.error('Authentication check failed:', error);
+                }
+            };
+            checkAuthenticationStatus();
+        }
+    }, []);
+
+
+    useEffect(() => {
+        const calculateAuctionStatus = () => {
+            if (!startDateTime || !endDateTime) {
+                setAuctionStatus('');
+                return;
+            }
+
+            const now = new Date();
+            const start = new Date(startDateTime);
+            const end = new Date(endDateTime);
+
+            if (now < start) {
+                setAuctionStatus('upcoming');
+            } else if (now >= start && now <= end) {
+                setAuctionStatus('ongoing');
+            } else {
+                setAuctionStatus('completed');
+            }
+        };
+
+        calculateAuctionStatus();
+    }, [startDateTime, endDateTime]);
 
     useEffect(() => {
         if (startDateTime && endDateTime) {
@@ -24,195 +80,251 @@ function AddProduct() {
         }
     }, [startDateTime, endDateTime]);
 
-    const handleImageChange = (e) => {
-        setProductImage(e.target.files[0]);
+    const handleImageAdd = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageList([...imageList, file]);
+        }
     };
 
-    const handleSubmit = (e) => {
+    const handleImageDelete = (index) => {
+        const imageName = imageList[index].name;
+        setImageList(imageList.filter((_, idx) => idx !== index));
+        if (imageName === primaryImage) {
+            setPrimaryImage(''); // Reset primary image if deleted
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Check for missing fields
-        if (!productName || !category || !subCategory || !numberOfParameters || !productImage || !startDateTime || !endDateTime || !minimumPrice || !priceInterval) {
+    
+        // Validate required fields
+        if (!productName || !category || !subCategory || !startDateTime || !endDateTime || !minimumPrice || !reservedPrice || !priceInterval || !primaryImage) {
             toast.error('Please fill in all required fields!');
             return;
         }
-        
-        // Log the data to console
-        console.log({
-            numberOfParameters,
+    
+        // Prepare the form data
+        const formData = {
+            username,
+            productId, // Assuming you have a unique productId generated somewhere
+            noOfParts,
             category,
             subCategory,
-            productImage,
             startDateTime,
             endDateTime,
-            auctionDuration,
+            auctionDuration, // Assuming this is calculated somewhere
             priceInterval,
+            minimumPrice,
+            reservedPrice,
             productName,
             description,
-            minimumPrice,
-        });
-
-        toast.success('Product added successfully!');
+            productStatus,
+            auctionStatus,
+            primaryImage,
+            otherImages: imageList.filter((image) => image.name !== primaryImage).map((img) => img.name),
+        };
+    
+        // Log form data (for debugging)
+        console.log('Form Data:', formData);
+        console.log('Images:', imageList);
+    
+        try {
+            // Call your backend API to save the product
+            const response = await axios.post(`${process.env.REACT_APP_ServerUrl}/addProduct`, formData, {
+                withCredentials: true // Include credentials if needed
+            });
+    
+            if (response.status === 200) {
+                toast.success('Product added successfully!');
+            } else {
+                toast.error('Failed to add product');
+            }
+        } catch (error) {
+            toast.error('Error adding product');
+            console.error('Error:', error);
+        }
     };
+    
 
     return (
-        <div className="container  p-2 col-11 border-2">
+        <div className="container p-2 col-11 border-2">
             <h2 className="text-center mb-4">Add Product</h2>
             <form onSubmit={handleSubmit}>
                 <div className="card shadow borderp">
                     <div className="card-body p-4">
                         <div className="row">
+                            <div className="col-lg-12 mb-4">
+                                <label className="form-label">Product ID:</label>
+                                <p className="form-control">{productId}</p>
+                            </div>
                             <div className="col-lg-8 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="productName" className="form-label">Product Name:</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="productName"
-                                        value={productName}
-                                        onChange={(e) => setProductName(e.target.value)}
-                                    />
-                                </div>
+                                <label className="form-label">Product Name:</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={productName}
+                                    onChange={(e) => setProductName(e.target.value)}
+                                />
                             </div>
-
                             <div className="col-lg-4 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="numberOfParameters" className="form-label">
-                                        Quantity (Number of Parameters):
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        id="numberOfParameters"
-                                        value={numberOfParameters}
-                                        onChange={(e) => setNumberOfParameters(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-6 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="category" className="form-label">Category:</label>
-                                    <select
-                                        id="category"
-                                        className="form-select"
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value)}
-                                    >
-                                        <option value="">- Select Category -</option>
-                                        <option value="Vintage Products">Vintage Products</option>
-                                        <option value="cars">cars</option>
-                                        <option value="hokka">crzzy</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="col-lg-6 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="subCategory" className="form-label">Sub-Category:</label>
-                                    <select
-                                        id="subCategory"
-                                        className="form-select"
-                                        value={subCategory}
-                                        onChange={(e) => setSubCategory(e.target.value)}
-                                    >
-                                        <option value="">- Select Sub-Category -</option>
-                                        <option value="supra">supra</option>
-                                        <option value="toyota">toyota</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                           
-
-                            <div className="col-lg-4 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="startDateTime" className="form-label">Start Session:</label>
-                                    <input
-                                        type="datetime-local"
-                                        className="form-control"
-                                        id="startDateTime"
-                                        value={startDateTime}
-                                        onChange={(e) => setStartDateTime(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-4 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="endDateTime" className="form-label">End Session:</label>
-                                    <input
-                                        type="datetime-local"
-                                        className="form-control"
-                                        id="endDateTime"
-                                        value={endDateTime}
-                                        onChange={(e) => setEndDateTime(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-4 mb-4">
-                                <div className="mb-3">
-                                    <label className="form-label">Auction Duration:</label>
-                                    <p className="form-control">{auctionDuration || 'Duration will appear here'}</p>
-                                </div>
-                            </div>
-                            <div className="col-lg-6 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="productImage" className="form-label">Product Image:</label>
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        id="productImage"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-3 mb-4">
-                                <label htmlFor="minimumPrice" className="form-label">Minimum Price:</label>
+                                <label className="form-label">No of Parts:</label>
                                 <input
                                     type="number"
                                     className="form-control"
-                                    id="minimumPrice"
+                                    value={noOfParts}
+                                    onChange={(e) => setNoOfParts(e.target.value)}
+                                    min="1"
+                                />
+                            </div>
+                            <div className="col-lg-6 mb-4">
+                                <label className="form-label">Category:</label>
+                                <select
+                                    className="form-select"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                >
+                                    <option value="">- Select Category -</option>
+                                    <option value="Vintage Products">Vintage Products</option>
+                                    <option value="Cars">Cars</option>
+                                </select>
+                            </div>
+                            <div className="col-lg-6 mb-4">
+                                <label className="form-label">Sub-Category:</label>
+                                <select
+                                    className="form-select"
+                                    value={subCategory}
+                                    onChange={(e) => setSubCategory(e.target.value)}
+                                >
+                                    <option value="">- Select Sub-Category -</option>
+                                    <option value="Supra">Supra</option>
+                                    <option value="Toyota">Toyota</option>
+                                </select>
+                            </div>
+                            <div className="col-lg-4 mb-4">
+                                <label className="form-label">Start Session:</label>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control"
+                                    value={startDateTime}
+                                    onChange={(e) => setStartDateTime(e.target.value)}
+                                />
+                            </div>
+                            <div className="col-lg-4 mb-4">
+                                <label className="form-label">End Session:</label>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control"
+                                    value={endDateTime}
+                                    onChange={(e) => setEndDateTime(e.target.value)}
+                                />
+                            </div>
+                            <div className="col-lg-4 mb-4">
+                                <label className="form-label">Auction Duration:</label>
+                                <p className="form-control">{auctionDuration || 'Duration will appear here'}</p>
+                            </div>
+                            <div className="col-lg-4 mb-4">
+                                <label className="form-label">Minimum Price:</label>
+                                <input
+                                    type="number"
+                                    className="form-control"
                                     value={minimumPrice}
                                     onChange={(e) => setMinimumPrice(e.target.value)}
                                 />
                             </div>
-                            <div className="col-3 mb-4">
-                                <label htmlFor="priceInterval" className="form-label">Price Interval:</label>
+                            <div className="col-lg-4 mb-4">
+                                <label className="form-label">Reserved Price:</label>
+                                <input
+                                    type="number"
+                                    className="form-control"
+                                    value={reservedPrice}
+                                    onChange={(e) => setReservedPrice(e.target.value)}
+                                />
+                            </div>
+                            <div className="col-lg-4 mb-4">
+                                <label className="form-label">Price Interval:</label>
                                 <input
                                     type="text"
                                     className="form-control"
-                                    id="priceInterval"
                                     value={priceInterval}
                                     onChange={(e) => setPriceInterval(e.target.value)}
                                 />
                             </div>
-
+                            <div className="col-lg-6 mb-4">
+                                <label className="form-label">Product Status:</label>
+                                <p className="form-control">{productStatus}</p>
+                            </div>
+                            <div className="col-lg-6 mb-4">
+                                <label className="form-label">Auction Status:</label>
+                                <p className="form-control">{auctionStatus || 'Status will appear here'}</p>
+                            </div>
                             <div className="col-lg-12 mb-4">
-                                <div className="mb-3">
-                                    <label htmlFor="description" className="form-label">Product Description:</label>
-                                    <textarea
-                                        className="form-control"
-                                        id="description"
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        rows="3"
-                                    />
-                                </div>
+                                <label className="form-label">Product Images:</label>
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    accept="image/*"
+                                    onChange={handleImageAdd}
+                                />
+                                <table className="table mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th>Preview</th>
+                                            <th>Image Name</th>
+                                            <th>Set Primary</th>
+                                            <th>Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {imageList.map((image, index) => (
+                                            <tr key={index}>
+                                                <td>
+                                                    <img
+                                                        src={URL.createObjectURL(image)}
+                                                        alt="Preview"
+                                                        style={{ width: '50px', height: '50px' }}
+                                                    />
+                                                </td>
+                                                <td>{image.name}</td>
+                                                <td>
+                                                    <button
+                                                        type="button"
+                                                        className={`btn ${primaryImage === image.name ? 'btn-success' : 'btn-secondary'}`}
+                                                        onClick={() => setPrimaryImage(image.name)}
+                                                    >
+                                                        {primaryImage === image.name ? 'Primary' : 'Set as Primary'}
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-danger"
+                                                        onClick={() => handleImageDelete(index)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="col-lg-12 mb-4">
+                                <label className="form-label">Product Description:</label>
+                                <textarea
+                                    className="form-control"
+                                    rows="3"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                />
                             </div>
                         </div>
-
                         <div className="text-center">
                             <button type="submit" className="btn btn-dark w-50">Submit</button>
                         </div>
                     </div>
                 </div>
             </form>
-
-            {/* Toast notifications */}
             <ToastContainer />
         </div>
     );

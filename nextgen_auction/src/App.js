@@ -10,6 +10,7 @@ import SellerOnboarding from './components/seller/SellerOnboarding';
 import BidderOnboarding from './components/bidder/BidderOnboarding';
 import AddProduct from './components/seller/AddProduct';
 import SellerDashBoard from './components/seller/SellerDashboard';
+import SignUp from './components/signup';
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -41,6 +42,8 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Hero />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/signup" element={<SignUp />} />
                     <Route path="/SellerOnboarding" element={<SellerOnboarding />} />
                     <Route path="/BidderOnboarding" element={<BidderOnboarding />} />
                 </Routes>
@@ -93,6 +96,7 @@ function App() {
                 return (
                     <Routes>
                         <Route path="/" element={<Hero />} />
+                        <Route path="/signup" element={<SignUp />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/SellerOnboarding" element={<SellerOnboarding />} />
                         <Route path="/BidderOnboarding" element={<BidderOnboarding />} />
