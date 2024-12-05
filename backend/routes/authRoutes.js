@@ -13,6 +13,7 @@ router.post('/genotp', authController.genotp);
 router.post('/signup', authController.signup);
 router.post('/addProduct', authController.addProduct);
 router.get('/login', authController.login);
+router.get('/products', authController.getProductDetails);
 router.get('/profile', authController.getProfile);
 router.get('/getotp', authController.getotp);
 

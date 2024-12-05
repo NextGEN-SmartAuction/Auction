@@ -1,21 +1,101 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Countdown from "react-countdown";
+import { useNavigate } from "react-router-dom";
 
 const AuctionItems = () => {
-    const [data, setData] = useState(null);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [modalData, setModalData] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        fetch("/data.json") // Ensure the file is in the public folder
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((json) => setData(json))
-            .catch((error) => console.error("Error fetching data:", error));
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_ServerUrl}/products`, {
+                    withCredentials: true,
+                });
+                setProducts(response.data.data);
+                setLoading(false);
+            } catch (err) {
+                console.error("Error fetching product details:", err.response?.data || err.message);
+                setError("Failed to fetch product details! Please try again.");
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
     }, []);
 
-    if (!data) {
+    const groupedProducts = {
+        ongoing: products.filter((p) => p.auctionStatus === "ongoing"),
+        upcoming: products.filter((p) => p.auctionStatus === "upcoming"),
+        completed: products.filter((p) => p.auctionStatus === "completed"),
+    };
+
+    const openModal = (product) => setModalData(product);
+    const closeModal = () => setModalData(null);
+
+    const renderCountdown = ({ days, hours, minutes, seconds, completed }, isUpcoming) => {
+        if (completed) {
+            return <span style={styles.countdown}>{isUpcoming ? "Auction Started" : "Auction Ended"}</span>;
+        }
+        return (
+            <span style={styles.countdown}>
+                {isUpcoming ? "Auction starts in: " : "Auction ends in: "}
+                {days}d {hours.toString().padStart(2, "0")}:
+                {minutes.toString().padStart(2, "0")}:
+                {seconds.toString().padStart(2, "0")}
+            </span>
+        );
+    };
+
+    const handlePlaceBid = (productId) => {
+        navigate(`/bidder/viewproduct`, { state: { productId } });
+    };
+
+    const renderSection = (title, items, isUpcoming) => (
+        <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>{title}</h2>
+            <div style={styles.container}>
+                {items.map((product) => (
+                    <div key={product.productId} style={styles.card}>
+                        <img
+                            src={`${process.env.REACT_APP_DataServer}/products/${product.productId}_p.jpeg`}
+                            alt={product.productName}
+                            style={styles.image}
+                        />
+                        <div style={styles.cardContent}>
+                            <h3 style={styles.title}>{product.productName}</h3>
+                            <p style={styles.category}>Category: {product.category}</p>
+                            <p style={styles.auctionStatus}>
+                                <Countdown
+                                    date={isUpcoming ? new Date(product.startDateTime) : new Date(product.endDateTime)}
+                                    renderer={(props) => renderCountdown(props, isUpcoming)}
+                                />
+                            </p>
+                            <p style={styles.minimumPrice}>
+                                Minimum Price: <strong>₹{product.minimumPrice}</strong>
+                            </p>
+                            <div style={styles.buttonGroup}>
+                                <button style={styles.button} onClick={() => openModal(product)}>
+                                    View Details
+                                </button>
+                                {product.auctionStatus === "ongoing" && (
+                                    <button style={styles.button} onClick={() => handlePlaceBid(product.productId)}>
+                                        Place Bid
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    if (loading) {
         return (
             <div style={styles.loaderContainer}>
                 <p style={styles.loaderText}>Loading auction items...</p>
@@ -23,34 +103,32 @@ const AuctionItems = () => {
         );
     }
 
+    if (error) {
+        return (
+            <div style={styles.errorContainer}>
+                <p style={styles.errorText}>{error}</p>
+            </div>
+        );
+    }
+
     return (
-        <div style={styles.container}>
-            {data.map((seller, sellerIndex) =>
-                seller.items.map((item, itemIndex) => (
-                    <div key={`${sellerIndex}-${itemIndex}`} style={styles.card}>
-                        <img
-                            src={item.itemImages[0]}
-                            alt={item.itemName}
-                            style={styles.image}
-                        />
-                        <div style={styles.cardContent}>
-                            <h3 style={styles.title}>{item.itemName}</h3>
-                            <p style={styles.sellerName}>
-                                By: <strong>{seller.displayName}</strong> ({seller.orgName})
-                            </p>
-                            <p style={styles.description}>{item.itemDescription}</p>
-                            <p style={styles.status}>
-                                Status: <span>{item.auctionStatus.toUpperCase()}</span>
-                            </p>
-                            <p style={styles.bid}>
-                                Current Bid: <strong>₹{item.currentBid}</strong>
-                            </p>
-                            <button style={styles.button}>BUY NOW</button>
-                        </div>
+        <>
+            {renderSection("Upcoming Auctions", groupedProducts.upcoming, true)}
+            {renderSection("Ongoing Auctions", groupedProducts.ongoing, false)}
+            {renderSection("Completed Auctions", groupedProducts.completed)}
+
+            {modalData && (
+                <div style={styles.modalOverlay} onClick={closeModal}>
+                    <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+                        <h2 style={styles.modalTitle}>{modalData.productName}</h2>
+                        <p style={styles.modalText}>{modalData.description}</p>
+                        <button style={styles.modalCloseButton} onClick={closeModal}>
+                            Close
+                        </button>
                     </div>
-                ))
+                </div>
             )}
-        </div>
+        </>
     );
 };
 
@@ -59,102 +137,98 @@ const styles = {
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center",
-        padding: "40px",
         gap: "30px",
-        background: "linear-gradient(120deg, #f6d365, #fda085)", // Gradient background
-        minHeight: "100vh",
+        padding: "20px",
+    },
+    section: {
+        padding: "20px",
+    },
+    sectionTitle: {
+        textAlign: "center",
+        fontSize: "24px",
+        fontWeight: "bold",
+        marginBottom: "20px",
     },
     loaderContainer: {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        backgroundColor: "#f8f8f8",
     },
     loaderText: {
         fontSize: "20px",
         fontWeight: "bold",
-        color: "#333",
     },
     card: {
         width: "300px",
-        borderRadius: "12px",
+        borderRadius: "10px",
         overflow: "hidden",
-        boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)",
-        backgroundColor: "#fff",
-        transition: "transform 0.3s, box-shadow 0.3s",
-        cursor: "pointer",
+        boxShadow: "0 5px 10px rgba(0, 0, 0, 0.2)",
     },
     cardContent: {
-        padding: "20px",
-        textAlign: "left",
+        padding: "15px",
     },
     image: {
         width: "100%",
         height: "200px",
         objectFit: "cover",
-        borderTopLeftRadius: "12px",
-        borderTopRightRadius: "12px",
     },
     title: {
-        fontSize: "20px",
+        fontSize: "18px",
         fontWeight: "bold",
-        color: "#333",
-        marginBottom: "10px",
     },
-    sellerName: {
-        fontSize: "14px",
-        color: "#666",
-        marginBottom: "8px",
-    },
-    description: {
-        fontSize: "14px",
-        color: "#555",
-        marginBottom: "15px",
-        lineHeight: "1.5",
-    },
-    status: {
-        fontSize: "14px",
-        color: "#ff6f61",
-        fontWeight: "bold",
-        marginBottom: "10px",
-    },
-    bid: {
+    auctionStatus: {
         fontSize: "16px",
         fontWeight: "bold",
+        color: "#f00",
+    },
+    countdown: {
         color: "#4caf50",
-        marginBottom: "20px",
+        fontWeight: "bold",
     },
     button: {
-        width: "100%",
-        padding: "12px",
+        marginTop: "10px",
+        padding: "10px",
         backgroundColor: "#ff6f61",
         color: "#fff",
         border: "none",
-        borderRadius: "6px",
-        fontSize: "14px",
-        fontWeight: "bold",
-        textAlign: "center",
-        textTransform: "uppercase",
+        borderRadius: "5px",
         cursor: "pointer",
-        transition: "background-color 0.3s",
     },
-    buttonHover: {
-        backgroundColor: "#e65c55",
+    modalOverlay: {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modal: {
+        backgroundColor: "#fff",
+        padding: "20px",
+        borderRadius: "10px",
+        width: "400px",
+        textAlign: "center",
+    },
+    modalTitle: {
+        fontSize: "20px",
+        fontWeight: "bold",
+    },
+    modalText: {
+        margin: "10px 0",
+    },
+    modalCloseButton: {
+        marginTop: "10px",
+        padding: "10px",
+        backgroundColor: "#ff6f61",
+        color: "#fff",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
     },
 };
-
-// Add hover effects using vanilla JS or CSS-in-JS
-document.addEventListener("mouseover", (e) => {
-    if (e.target.tagName === "BUTTON") {
-        e.target.style.backgroundColor = "#e65c55";
-    }
-});
-
-document.addEventListener("mouseout", (e) => {
-    if (e.target.tagName === "BUTTON") {
-        e.target.style.backgroundColor = "#ff6f61";
-    }
-});
 
 export default AuctionItems;

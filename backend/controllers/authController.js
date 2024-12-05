@@ -134,6 +134,29 @@ const signup = async (req, res) => {
 };
 
 
+const getProductDetails = async (req, res) => {
+    try {
+        // Fetch all product details from the database
+        const products = await ProductDetailsModal.find();
+
+        // Send the data as a JSON response
+        res.status(200).json({
+            success: true,
+            message: "Product details fetched successfully",
+            data: products,
+        });
+    } catch (error) {
+        console.error("Error fetching product details:", error);
+
+        // Send an error response
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch product details",
+            error: error.message,
+        });
+    }
+};
+
 
 
 const addProduct = async (req, res) => {
@@ -268,5 +291,6 @@ module.exports = {
     login,
     getProfile,
     getotp,
+    getProductDetails,
     addProduct
 };
