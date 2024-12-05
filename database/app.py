@@ -99,5 +99,15 @@ def upload_product_images():
 
     return jsonify({'message': 'Images uploaded successfully', 'files': saved_files}), 200
 
+
+@app.route('/get-product-images/<product_id>', methods=['GET'])
+def get_product_images(product_id):
+    image_folder = os.path.join(UPLOAD_FOLDER,"products")  # Replace with the actual path to your images folder
+    images = [
+        img for img in os.listdir(image_folder) if img.startswith(product_id)
+    ]
+    if not images:
+        return jsonify({"success": False, "message": "No images found for the product"}), 404
+    return jsonify({"success": True, "images": images}), 200
 if __name__ == '__main__':
     app.run(debug=True, port=5001)  # Make sure Flask is running on port 5001

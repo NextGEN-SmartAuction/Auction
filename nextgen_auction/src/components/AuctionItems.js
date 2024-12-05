@@ -51,8 +51,11 @@ const AuctionItems = () => {
         );
     };
 
+ 
+
     const handlePlaceBid = (productId) => {
-        navigate(`/bidder/viewproduct`, { state: { productId } });
+        const hash = btoa(productId); // Hash the product ID
+        navigate(`/bidder/viewproduct/${hash}`);
     };
 
     const renderSection = (title, items, isUpcoming) => (
@@ -79,11 +82,11 @@ const AuctionItems = () => {
                                 Minimum Price: <strong>₹{product.minimumPrice}</strong>
                             </p>
                             <div style={styles.buttonGroup}>
-                                <button style={styles.button} onClick={() => openModal(product)}>
+                                <button style={styles.button} className="mx-2"onClick={() => openModal(product)}>
                                     View Details
                                 </button>
                                 {product.auctionStatus === "ongoing" && (
-                                    <button style={styles.button} onClick={() => handlePlaceBid(product.productId)}>
+                                    <button style={styles.button} className="mx-3" onClick={() => handlePlaceBid(product.productId)}>
                                         Place Bid
                                     </button>
                                 )}

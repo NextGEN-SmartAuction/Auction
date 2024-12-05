@@ -11,6 +11,7 @@ import BidderOnboarding from './components/bidder/BidderOnboarding';
 import AddProduct from './components/seller/AddProduct';
 import SellerDashBoard from './components/seller/SellerDashboard';
 import SignUp from './components/signup';
+import ViewProduct from './components/ViewProduct';
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -89,6 +90,8 @@ function App() {
                 return (
                     <Routes>
                         <Route path="/bidder" element={<Home />} />
+                        <Route path="/bidder/viewproduct/:hash" element={<ViewProduct />} />
+
                         {/* Add more bidder-specific routes here */}
                     </Routes>
                 );
