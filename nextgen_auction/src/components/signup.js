@@ -68,10 +68,12 @@ function SignUp() {
                 style={{ background: 'linear-gradient(to bottom, #FF6F61, #FF9A8B)' }}
             >
                 <img
-                    src="https://via.placeholder.com/400"
+                    src="https://media.istockphoto.com/id/472376163/vector/online-shopping-and-delivery-from-your-tablet.jpg?s=612x612&w=0&k=20&c=z3sGF1W2VtskPMDozh0yDw-Pm0VsadbRlta9IfKxB8Y="
                     alt="Seller Onboarding"
                     style={styles.image}
                     className="p-4"
+                    width={612}
+                    height={612}
                 />
                 <h1 style={styles.heading} className="mt-3">Seller Onboarding</h1>
                 <p style={styles.description}>Join us as a seller and start your business journey!</p>
@@ -99,10 +101,12 @@ function SignUp() {
                 style={{ background: 'linear-gradient(to bottom, #00B4D8, #48C9B0)' }}
             >
                 <img
-                    src="https://via.placeholder.com/400"
+                    src="https://media.istockphoto.com/id/1194209496/vector/car-auction-online-vector-concept-for-web-banner-website-page.jpg?s=612x612&w=0&k=20&c=MeowyJmB5FeDsyW-Aod5iwPHSeSY2tPcl20iC34StSc="
                     alt="Bidder Onboarding"
                     style={styles.image}
                     className="p-4"
+                    width={612}
+                    height={612}
                 />
                 <h1 style={styles.heading} className="mt-3">Bidder Onboarding</h1>
                 <p style={styles.description}>Join us as a bidder and start participating in exciting bids!</p>

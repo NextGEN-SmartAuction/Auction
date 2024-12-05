@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import React, { useEffect, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function AddProduct() {
@@ -23,6 +23,111 @@ function AddProduct() {
     const [productStatus] = useState('unsold'); // Default product status
     const [auctionStatus, setAuctionStatus] = useState(''); // Dynamically calculated auction status
     const [username, setUsername] = useState(null);
+    const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+
+    const categories = {
+        "Electronics": {
+            "Mobile Phones": ["Apple", "Samsung", "OnePlus", "Xiaomi", "Oppo", "Vivo", "Google", "Motorola", "Sony", "Nokia"],
+            "Tablets": ["Apple", "Samsung", "Lenovo", "Microsoft", "Amazon Fire", "Huawei"],
+            "Laptops": ["Dell", "HP", "Lenovo", "Apple", "Acer", "Asus", "Microsoft", "Razer"],
+            "Desktops": ["Dell", "HP", "Lenovo", "Apple", "Acer", "Asus", "MSI", "iBUYPOWER"],
+            "Smart Watches": ["Apple", "Samsung", "Garmin", "Fitbit", "Fossil", "Amazfit"],
+            "Gaming Consoles": ["Sony PlayStation", "Microsoft Xbox", "Nintendo Switch", "Steam Deck"],
+            "Audio Devices": ["Sony", "Bose", "JBL", "Sennheiser", "Beats", "Anker"],
+            "Cameras & Photography": ["Canon", "Nikon", "Sony", "Fujifilm", "Panasonic", "Olympus"],
+            "Home Electronics": ["Samsung", "LG", "Sony", "TCL", "Vizio"],
+            "Accessories": ["Belkin", "Anker", "Ugreen", "Baseus", "Logitech"]
+        },
+        "Fashion": {
+            "Men's Clothing": ["H&M", "Zara", "Levi's", "Uniqlo", "Tommy Hilfiger", "Nike"],
+            "Women's Clothing": ["H&M", "Zara", "Forever 21", "Levi's", "Uniqlo"],
+            "Kid's Clothing": ["Carter's", "H&M Kids", "The Children's Place", "BabyGap"],
+            "Footwear": ["Nike", "Adidas", "Puma", "Reebok", "Skechers"],
+            "Jewelry": ["Tiffany & Co.", "Pandora", "Swarovski", "Cartier", "Blue Nile"],
+            "Watches": ["Casio", "Rolex", "Fossil", "Seiko", "Titan", "Omega"],
+            "Bags": ["Louis Vuitton", "Gucci", "Prada", "Samsonite", "Herschel"],
+            "Eyewear": ["Ray-Ban", "Oakley", "Persol", "Carrera", "Tom Ford"]
+        },
+        "Home & Living": {
+            "Furniture": ["IKEA", "Wayfair", "Ashley Furniture", "West Elm", "Home Centre"],
+            "Home Décor": ["Pottery Barn", "West Elm", "Crate & Barrel", "IKEA"],
+            "Kitchen Appliances": ["KitchenAid", "Cuisinart", "Breville", "Instant Pot", "Vitamix"],
+            "Lighting": ["Philips Hue", "GE Lighting", "Lutron", "Cree", "Legrand"],
+            "Bedding": ["Casper", "Saatva", "Tempur-Pedic", "Brooklinen", "Parachute"],
+            "Storage Solutions": ["IKEA", "Sterilite", "ClosetMaid", "The Container Store"],
+            "Garden Supplies": ["Fiskars", "Scotts", "Black & Decker", "Gardena"]
+        },
+        "Vehicles": {
+            "Cars": ["Toyota", "Honda", "Ford", "Hyundai", "Tata", "Suzuki", "BMW", "Mercedes-Benz", "Audi", "Tesla"],
+            "Motorcycles": ["Harley-Davidson", "Yamaha", "Honda", "Kawasaki", "Ducati", "Suzuki"],
+            "Bicycles": ["Trek", "Specialized", "Giant", "Cannondale", "Schwinn", "Hero"],
+            "Boats": ["Bayliner", "Sea Ray", "Yamaha", "MasterCraft", "Beneteau"],
+            "Auto Parts & Accessories": ["Michelin", "Bridgestone", "Bosch", "Castrol", "Goodyear"]
+        },
+        "Sports & Outdoors": {
+            "Sports Equipment": ["Nike", "Adidas", "Puma", "Wilson", "Spalding", "Yonex"],
+            "Fitness Equipment": ["Bowflex", "NordicTrack", "Peloton", "ProForm", "Life Fitness"],
+            "Outdoor Gear": ["The North Face", "Columbia", "Patagonia", "Osprey", "REI"],
+            "Cycling": ["Shimano", "Trek", "Specialized", "Giant", "Cannondale"]
+        },
+        "Books & Media": {
+            "Books": ["Penguin Random House", "HarperCollins", "Simon & Schuster", "Macmillan", "Hachette"],
+            "Magazines": ["Time", "National Geographic", "Forbes", "Vogue", "The Economist"],
+            "Music": ["Sony Music", "Universal Music", "Warner Music", "Yamaha Instruments", "Fender"],
+            "Movies & TV": ["Disney", "Warner Bros", "Universal Pictures", "HBO", "Paramount"],
+            "Games": ["Sony PlayStation", "Microsoft Xbox", "Nintendo", "Epic Games", "Ubisoft"]
+        },
+        "Health & Beauty": {
+            "Skincare": ["The Ordinary", "Neutrogena", "Cerave", "Olay", "Clinique"],
+            "Haircare": ["L'Oréal", "Pantene", "Garnier", "Tresemmé", "Aussie"],
+            "Makeup": ["MAC", "Maybelline", "L'Oréal", "Sephora", "NARS"],
+            "Personal Care": ["Gillette", "Oral-B", "Dove", "Colgate", "Braun"],
+            "Fitness Supplements": ["Optimum Nutrition", "MuscleTech", "Dymatize", "BSN", "GNC"],
+            "Medical Equipment": ["Omron", "Accu-Chek", "Philips", "Medtronic"]
+        },
+        "Collectibles": {
+            "Antiques": ["Christie’s", "Sotheby’s", "Heritage Auctions"],
+            "Coins": ["US Mint", "Royal Canadian Mint", "Perth Mint"],
+            "Stamps": ["Stanley Gibbons", "Scott Catalogue"],
+            "Art": ["Pablo Picasso", "Claude Monet", "Vincent van Gogh", "Banksy"],
+            "Vintage Items": ["Rolex", "Louis Vuitton", "Hermès", "Gucci"],
+            "Memorabilia": ["Topps", "Panini", "Fanatics", "Upper Deck"]
+        },
+        "Industrial & Business": {
+            "Office Equipment": ["HP", "Canon", "Epson", "Brother"],
+            "Industrial Tools": ["Bosch", "DeWalt", "Makita", "Hilti", "Stanley"],
+            "Commercial Kitchen Equipment": ["Vollrath", "Robot Coupe", "Blodgett", "True Refrigeration"],
+            "Construction Equipment": ["Caterpillar", "JCB", "Komatsu", "John Deere"],
+            "Agricultural Tools": ["John Deere", "Kubota", "Mahindra", "New Holland"]
+        },
+        "Real Estate": {
+            "Residential Properties": ["Lodha", "DLF", "Sobha", "Godrej Properties"],
+            "Commercial Properties": ["WeWork", "Regus", "DLF", "Embassy"],
+            "Land": ["RE/MAX", "Century 21"],
+            "Vacation Rentals": ["Airbnb", "Vrbo", "Expedia"]
+        },
+        "Toys & Baby Products": {
+            "Baby Gear": ["Graco", "Chicco", "Fisher-Price", "Britax"],
+            "Baby Essentials": ["Huggies", "Pampers", "Johnson & Johnson"],
+            "Toys for Kids": ["Lego", "Mattel", "Hasbro", "Fisher-Price", "Hot Wheels"]
+        },
+        "Food & Beverages": {
+            "Packaged Food": ["Nestle", "Kraft Heinz", "Mondelez", "PepsiCo"],
+            "Beverages": ["Coca-Cola", "Pepsi", "Red Bull", "Starbucks"],
+            "Gourmet & Specialty Food": ["Godiva", "Lindt", "Toblerone", "Ferrero Rocher"]
+        },
+        "Software & Services": {
+            "Digital Products": ["Microsoft Office", "Adobe Creative Suite", "Google Workspace"],
+            "Online Subscriptions": ["Netflix", "Spotify", "Amazon Prime", "Hulu"],
+            "Professional Services": ["Fiverr", "Upwork", "Toptal", "99designs"]
+        },
+        "Others": {
+            "Tickets": ["Ticketmaster", "StubHub", "Eventbrite"],
+            "Gift Cards": ["Amazon", "iTunes", "Google Play", "Starbucks"],
+            "Miscellaneous": ["eBay", "Alibaba", "Wish", "Walmart"]
+        }
+    }
+
 
 
 
@@ -37,7 +142,7 @@ function AddProduct() {
                         `${process.env.REACT_APP_ServerUrl}/profile`,
                         { withCredentials: true }
                     );
-                    const {username } = response.data;
+                    const { username } = response.data;
                     setUsername(username);
                 } catch (error) {
                     console.error('Authentication check failed:', error);
@@ -95,15 +200,34 @@ function AddProduct() {
         }
     };
 
+
+
+    const handleCategoryChange = (e) => {
+        const selectedCategory = e.target.value;
+        setCategory(selectedCategory);
+
+        // Set sub-category options dynamically based on the selected category
+        if (selectedCategory && categories[selectedCategory]) {
+            setSubCategoryOptions(Object.keys(categories[selectedCategory]));
+        } else {
+            setSubCategoryOptions([]);
+        }
+        setSubCategory(''); // Reset sub-category when category changes
+    };
+
+    const handleSubCategoryChange = (e) => {
+        setSubCategory(e.target.value);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         // Validate required fields
         if (!productName || !category || !subCategory || !startDateTime || !endDateTime || !minimumPrice || !reservedPrice || !priceInterval || !primaryImage) {
             toast.error('Please fill in all required fields!');
             return;
         }
-    
+
         // Prepare the form data for the first API call
         const formData = {
             username,
@@ -124,17 +248,17 @@ function AddProduct() {
             primaryImage,
             otherImages: imageList.filter((image) => image.name !== primaryImage).map((img) => img.name),
         };
-    
+
         // Log form data (for debugging)
         console.log('Form Data:', formData);
         console.log('Images:', imageList);
-    
+
         try {
             // Call your backend API to save the product
             const response = await axios.post(`${process.env.REACT_APP_ServerUrl}/addProduct`, formData, {
                 withCredentials: true, // Include credentials if needed
             });
-    
+
             if (response.status === 200) {
                 toast.success('Product added successfully!');
             } else {
@@ -146,7 +270,7 @@ function AddProduct() {
             console.error('Error:', error);
             return; // Stop further execution on error
         }
-    
+
         // Prepare the form data for the second API call (image upload)
         const formData1 = new FormData();
         formData1.append("productData", JSON.stringify(formData));
@@ -156,7 +280,7 @@ function AddProduct() {
             .forEach((img, index) => {
                 formData1.append(`otherImages${index + 1}`, img);
             });
-    
+
         try {
             const response = await axios.post(`${process.env.REACT_APP_FlaskUrl}/uploadProductImages`, formData1, {
                 withCredentials: true,
@@ -164,7 +288,7 @@ function AddProduct() {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-    
+
             if (response.status === 200) {
                 toast.success('Product and images uploaded successfully!');
             } else {
@@ -175,8 +299,8 @@ function AddProduct() {
             console.error('Error:', error);
         }
     };
-    
-    
+
+
 
     return (
         <div className="container p-2 col-11 border-2">
@@ -208,29 +332,38 @@ function AddProduct() {
                                     min="1"
                                 />
                             </div>
-                            <div className="col-lg-6 mb-4">
-                                <label className="form-label">Category:</label>
-                                <select
-                                    className="form-select"
-                                    value={category}
-                                    onChange={(e) => setCategory(e.target.value)}
-                                >
-                                    <option value="">- Select Category -</option>
-                                    <option value="Vintage Products">Vintage Products</option>
-                                    <option value="Cars">Cars</option>
-                                </select>
-                            </div>
-                            <div className="col-lg-6 mb-4">
-                                <label className="form-label">Sub-Category:</label>
-                                <select
-                                    className="form-select"
-                                    value={subCategory}
-                                    onChange={(e) => setSubCategory(e.target.value)}
-                                >
-                                    <option value="">- Select Sub-Category -</option>
-                                    <option value="Supra">Supra</option>
-                                    <option value="Toyota">Toyota</option>
-                                </select>
+                            <div className="row">
+                                <div className="col-lg-6 mb-4">
+                                    <label className="form-label">Category:</label>
+                                    <select
+                                        className="form-select"
+                                        value={category}
+                                        onChange={handleCategoryChange}
+                                    >
+                                        <option value="">- Select Category -</option>
+                                        {Object.keys(categories).map((cat) => (
+                                            <option key={cat} value={cat}>
+                                                {cat}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-lg-6 mb-4">
+                                    <label className="form-label">Sub-Category:</label>
+                                    <select
+                                        className="form-select"
+                                        value={subCategory}
+                                        onChange={handleSubCategoryChange}
+                                        disabled={!subCategoryOptions.length}
+                                    >
+                                        <option value="">- Select Sub-Category -</option>
+                                        {subCategoryOptions.map((subCat) => (
+                                            <option key={subCat} value={subCat}>
+                                                {subCat}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                             <div className="col-lg-4 mb-4">
                                 <label className="form-label">Start Session:</label>
