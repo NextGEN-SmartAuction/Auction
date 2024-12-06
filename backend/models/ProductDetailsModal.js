@@ -6,6 +6,12 @@ const productDetailsSchema = new mongoose.Schema({
         required: true,
         unique: true, // Ensure productId is unique
     },
+    sellerId: {
+        type: String,
+        required: true,
+        unique: true, // Ensure productId is unique
+    },
+    
     noOfParts: {
         type: Number,
         default: 1, // Default value

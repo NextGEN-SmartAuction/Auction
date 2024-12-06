@@ -23,6 +23,7 @@ function AddProduct() {
     const [productStatus] = useState('unsold'); // Default product status
     const [auctionStatus, setAuctionStatus] = useState(''); // Dynamically calculated auction status
     const [username, setUsername] = useState(null);
+    const [userId, setUserId] = useState(null);
     const [subCategoryOptions, setSubCategoryOptions] = useState([]);
 
     const categories = {
@@ -142,8 +143,9 @@ function AddProduct() {
                         `${process.env.REACT_APP_ServerUrl}/profile`,
                         { withCredentials: true }
                     );
-                    const { username } = response.data;
+                    const { username ,userId} = response.data;
                     setUsername(username);
+                    setUserId(userId);
                 } catch (error) {
                     console.error('Authentication check failed:', error);
                 }
@@ -231,6 +233,7 @@ function AddProduct() {
         // Prepare the form data for the first API call
         const formData = {
             username,
+            userId,
             productId, // Assuming you have a unique productId generated somewhere
             noOfParts,
             category,

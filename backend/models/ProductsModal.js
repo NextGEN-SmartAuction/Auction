@@ -24,6 +24,11 @@ const productsSchema = new mongoose.Schema({
         required: true,
         unique: true, // Ensure one document per user
     },
+    sellerId: {
+        type: String,
+        required: true,
+        unique: true, // Ensure one document per user
+    },
     products: {
         type: [productSchema],
         default: [], // Default to an empty array

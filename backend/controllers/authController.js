@@ -24,7 +24,7 @@ var otp1 = 1;
 
 
 const generateToken = (user) => {
-    return jwt.sign({ username: user.username ,role:user.role,displayName: user.displayName}, 'secret_key is blash');
+    return jwt.sign({ username: user.username ,role:user.role,displayName: user.displayName ,userId :user.userId}, 'secret_key is blash');
 };
 
 const getotp = async (req, res) => {
@@ -160,11 +160,9 @@ const getProductDetails = async (req, res) => {
     }
 };
 
-
-
 const addProduct = async (req, res) => {
     try {
-        const { role, username, productId, auctionStatus, productStatus } = req.body;
+        const { role, username, productId, auctionStatus, productStatus, userId } = req.body;
 
         // Ensure user exists and has the correct role (seller)
         const user = await UserModel.findOne({ username });
@@ -180,11 +178,11 @@ const addProduct = async (req, res) => {
                 return res.status(400).send('Product with this ID already exists.');
             }
         }
-       
 
         // Create a new product in the ProductDetailsModal
         const newProductDetails = new ProductDetailsModal({
             productId,
+            sellerId: req.body.userId,
             noOfParts: req.body.noOfParts || 1, // Default to 1 if not provided
             category: req.body.category,
             subCategory: req.body.subCategory,
@@ -204,19 +202,35 @@ const addProduct = async (req, res) => {
         const productDetailsResult = await newProductDetails.save();
         console.log('Product details saved:', productDetailsResult);
 
-        // If the product details were saved successfully, add the product to the seller's product list (ProductsModal)
+        // If the product details were saved successfully, add the product to the seller's product list
         const product = {
             productId,
             auctionStatus: auctionStatus || 'upcoming',
             productStatus: productStatus || 'unsold',
         };
 
-        const updatedProducts = await ProductsModal.findOneAndUpdate(
-            { username },
-            { $push: { products: product } },
-            { upsert: true, new: true } // Create if not exists, and return the updated document
-        );
-        console.log('Product added to seller\'s product list:', updatedProducts);
+        // Check if the seller already has a ProductsModal document
+        const existingSeller = await ProductsModal.findOne({ username });
+
+        if (existingSeller) {
+            // If the ProductsModal document exists, update it
+            const updatedProducts = await ProductsModal.findOneAndUpdate(
+                { username },
+                { $push: { products: product } }, // Add new product to the 'products' array
+                { new: true } // Return the updated document
+            );
+            console.log('Product added to seller\'s product list:', updatedProducts);
+        } else {
+            // If no ProductsModal document exists for the user, create a new one
+            const newProductsModal = new ProductsModal({
+                username,
+                sellerId: userId,
+                products: [product] // Create a new array with the first product
+            });
+
+            const savedProductList = await newProductsModal.save();
+            console.log('New ProductsModal document created:', savedProductList);
+        }
 
         res.status(200).send('Product added successfully.');
 
@@ -270,8 +284,8 @@ const getProfile = (req, res) => {
     if (token) {
         try {
             const decoded = jwt.verify(token, 'secret_key is blash');
-            const { username,role,displayName } = decoded;
-            res.json({ username,role ,displayName});
+            const { username,role,displayName,userId } = decoded;
+            res.json({ username,role ,displayName,userId});
         } catch (err) {
             res.sendStatus(401); // Invalid token
         }
