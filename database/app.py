@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from dotenv import load_dotenv
-
+import requests
 # Load environment variables from .env file
 load_dotenv()
 
@@ -89,18 +89,25 @@ def upload_product_images():
     primary_image = request.files.get('primaryImage')
     if primary_image and allowed_file(primary_image.filename):
         filename = f"{product_id}_P.{secure_filename(primary_image.filename).rsplit('.', 1)[1]}"
-        primary_path = os.path.join(app.config['UPLOAD_FOLDER'], "products", filename)
-        primary_image.save(primary_path)
-        saved_files.append(filename)
+        files = {'file': (filename, primary_image.stream, primary_image.mimetype)}
+        response = requests.post(UPLOAD_FOLDER, files=files)
+        if response.status_code == 200:
+            saved_files.append(filename)
+        else:
+            raise Exception(f"Failed to upload primary image: {response.status_code}")
 
     # Handle other images
     other_images = [file for key, file in request.files.items() if key.startswith('otherImages')]
     for index, image in enumerate(other_images, start=1):
         if image and allowed_file(image.filename):
             filename = f"{product_id}_S{index}.{secure_filename(image.filename).rsplit('.', 1)[1]}"
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], "products", filename)
-            image.save(image_path)
-            saved_files.append(filename)
+            files = {'file': (filename, image.stream, image.mimetype)}
+            response = requests.post(UPLOAD_FOLDER, files=files)
+            if response.status_code == 200:
+                saved_files.append(filename)
+            else:
+                raise Exception(f"Failed to upload other image {index}: {response.status_code}")
+
 
     # Save product data into your database here (if applicable)
 
