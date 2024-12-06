@@ -2,9 +2,16 @@ import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid'; 
 
 
 const SellerOnboarding = () => {
+
+    const generateSID = () => {
+        const uuidWithoutHyphens = uuidv4().replace(/-/g, ''); // Remove hyphens
+        return `SID-${uuidWithoutHyphens.slice(0, 10)}`; // Take first 10 characters
+    };
+
     const [form, setForm] = useState({
         userName:"",
         email: "",
@@ -23,6 +30,7 @@ const SellerOnboarding = () => {
         },
         caption: "",
         role: "seller",
+        userId: generateSID(),
     });
 
     const [logoFile, setLogoFile] = useState(null);

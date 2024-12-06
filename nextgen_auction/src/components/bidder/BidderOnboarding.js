@@ -2,8 +2,14 @@ import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid'; 
 
 const BidderSignup = () => {
+
+    const generateBID = () => {
+        const uuidWithoutHyphens = uuidv4().replace(/-/g, ''); // Remove hyphens
+        return `BID-${uuidWithoutHyphens.slice(0, 10)}`; // Take first 10 characters
+    };
     const [form, setForm] = useState({
         userName: "",
         email: "",
@@ -20,6 +26,8 @@ const BidderSignup = () => {
             pincode: "",
             location: "",
         },
+        userId: generateBID(),
+
     });
 
     const [errors, setErrors] = useState({});

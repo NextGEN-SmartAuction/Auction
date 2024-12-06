@@ -1,12 +1,19 @@
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# Configure upload folder
-UPLOAD_FOLDER = "C:\\Users\\Vishnu\\Documents\\Gitprojects\\Auction\\database"
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# Use environment variables with the 'REACT_APP_' prefix
+UPLOAD_FOLDER = os.getenv('REACT_APP_UPLOAD_FOLDER', 'default_upload_path')  # Default to 'default_upload_path' if not set
+ALLOWED_EXTENSIONS = os.getenv('REACT_APP_ALLOWED_EXTENSIONS', 'png,jpg,jpeg,gif').split(',')
+REACT_APP_URL = os.getenv('REACT_APP_URL', 'http://localhost:3000')  # Default to 'http://localhost:3000'
+PORT = int(os.getenv('REACT_APP_PORT', 5001))  # Default to 5001 if not set
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Helper function to check allowed file extensions
@@ -16,7 +23,7 @@ def allowed_file(filename):
 # Manually set CORS headers
 @app.after_request
 def after_request(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'  # Allow your React app's origin
+    response.headers['Access-Control-Allow-Origin'] = REACT_APP_URL  # Use React app's URL from the .env file
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'  # Allowed HTTP methods
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'  # Allowed request headers
     response.headers['Access-Control-Allow-Credentials'] = 'true'  # Allow credentials
@@ -26,7 +33,7 @@ def after_request(response):
 @app.route('/upload', methods=['OPTIONS'])
 def options_request():
     response = jsonify({'message': 'Pre-flight request allowed'})
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers['Access-Control-Allow-Origin'] = REACT_APP_URL  # Use React app's URL from the .env file
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
@@ -82,7 +89,7 @@ def upload_product_images():
     primary_image = request.files.get('primaryImage')
     if primary_image and allowed_file(primary_image.filename):
         filename = f"{product_id}_P.{secure_filename(primary_image.filename).rsplit('.', 1)[1]}"
-        primary_path = os.path.join(app.config['UPLOAD_FOLDER'], "products",filename)
+        primary_path = os.path.join(app.config['UPLOAD_FOLDER'], "products", filename)
         primary_image.save(primary_path)
         saved_files.append(filename)
 
@@ -91,7 +98,7 @@ def upload_product_images():
     for index, image in enumerate(other_images, start=1):
         if image and allowed_file(image.filename):
             filename = f"{product_id}_S{index}.{secure_filename(image.filename).rsplit('.', 1)[1]}"
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'],"products", filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], "products", filename)
             image.save(image_path)
             saved_files.append(filename)
 
@@ -102,12 +109,13 @@ def upload_product_images():
 
 @app.route('/get-product-images/<product_id>', methods=['GET'])
 def get_product_images(product_id):
-    image_folder = os.path.join(UPLOAD_FOLDER,"products")  # Replace with the actual path to your images folder
+    image_folder = os.path.join(UPLOAD_FOLDER, "products")  # Replace with the actual path to your images folder
     images = [
         img for img in os.listdir(image_folder) if img.startswith(product_id)
     ]
     if not images:
         return jsonify({"success": False, "message": "No images found for the product"}), 404
     return jsonify({"success": True, "images": images}), 200
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)  # Make sure Flask is running on port 5001
+    app.run(debug=True, port=PORT)  # Use port from .env file

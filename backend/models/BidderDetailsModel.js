@@ -30,6 +30,10 @@ const bidderDetailsSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    bidderId: {
+        type: String,
+        required: true,
+    },
     name: {
         type: String,
         required: true,

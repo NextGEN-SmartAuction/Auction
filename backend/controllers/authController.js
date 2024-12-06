@@ -79,6 +79,7 @@ const signup = async (req, res) => {
             // If role is "seller", save the seller details first
             const newSeller = new SellerDetailsModel({
                 userName: req.body.userName,
+                sellerId: req.body.userId,
                 sellerName: req.body.sellerName,
                 displayName: req.body.displayName,
                 website: req.body.website,
@@ -99,6 +100,7 @@ const signup = async (req, res) => {
         if (req.body.role === 'bidder') {
             const newBidder = new BidderDetailsModel({
                 userName: req.body.userName,
+                bidderId:req.body.userId,
                 name: req.body.name,
                 displayName: req.body.displayName,
                 email: req.body.email,
@@ -113,6 +115,7 @@ const signup = async (req, res) => {
         // Now save the user information (this applies for both "seller" and other roles)
         const newUser = new UserModel({
             username: req.body.userName,
+            userId:req.body.userId,
             displayName: req.body.displayName,
             email: req.body.email,
             password: req.body.password,

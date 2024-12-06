@@ -31,6 +31,11 @@ const sellerDetailsSchema = new mongoose.Schema({
         required: true,
         unique: true,  // Ensure unique usernames
     },
+    sellerId: {
+        type: String,
+        required: true,
+        unique: true,  // Ensure unique usernames
+    },
     sellerName: {
         type: String,
         required: true,
