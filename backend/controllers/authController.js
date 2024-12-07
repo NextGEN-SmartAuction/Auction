@@ -10,7 +10,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-
+const Auction = require('../models/AuctionModel'); // Adjust the path if needed
+const BiddersAuction = require('../models/BiddersAuctionModel');
 const FormData = require('form-data');
 
 const axios = require('axios');
@@ -161,9 +162,22 @@ const getProductDetails = async (req, res) => {
     }
 };
 
+
 const addProduct = async (req, res) => {
     try {
-        const { role, username, productId, auctionStatus, productStatus, userId } = req.body;
+        const { 
+            role, 
+            username, 
+            productId, 
+            auctionStatus, 
+            productStatus, 
+            userId, 
+            startDateTime, 
+            endDateTime, 
+            startingPrice, 
+            priceInterval, 
+            minimumPrice 
+        } = req.body;
 
         // Ensure user exists and has the correct role (seller)
         const user = await UserModel.findOne({ username });
@@ -183,15 +197,15 @@ const addProduct = async (req, res) => {
         // Create a new product in the ProductDetailsModal
         const newProductDetails = new ProductDetailsModal({
             productId,
-            sellerId: req.body.userId,
+            sellerId: userId,
             noOfParts: req.body.noOfParts || 1, // Default to 1 if not provided
             category: req.body.category,
             subCategory: req.body.subCategory,
-            startDateTime: req.body.startDateTime,
-            endDateTime: req.body.endDateTime,
+            startDateTime,
+            endDateTime,
             auctionDuration: req.body.auctionDuration,
-            priceInterval: req.body.priceInterval,
-            minimumPrice: req.body.minimumPrice,
+            priceInterval,
+            minimumPrice,
             reservedPrice: req.body.reservedPrice,
             productName: req.body.productName,
             description: req.body.description,
@@ -203,18 +217,16 @@ const addProduct = async (req, res) => {
         const productDetailsResult = await newProductDetails.save();
         console.log('Product details saved:', productDetailsResult);
 
-        // If the product details were saved successfully, add the product to the seller's product list
+        // Add the product to the seller's product list
         const product = {
             productId,
             auctionStatus: auctionStatus || 'upcoming',
             productStatus: productStatus || 'unsold',
         };
 
-        // Check if the seller already has a ProductsModal document
         const existingSeller = await ProductsModal.findOne({ username });
 
         if (existingSeller) {
-            // If the ProductsModal document exists, update it
             const updatedProducts = await ProductsModal.findOneAndUpdate(
                 { username },
                 { $push: { products: product } }, // Add new product to the 'products' array
@@ -222,24 +234,41 @@ const addProduct = async (req, res) => {
             );
             console.log('Product added to seller\'s product list:', updatedProducts);
         } else {
-            // If no ProductsModal document exists for the user, create a new one
             const newProductsModal = new ProductsModal({
                 username,
                 sellerId: userId,
-                products: [product] // Create a new array with the first product
+                products: [product]
             });
 
             const savedProductList = await newProductsModal.save();
             console.log('New ProductsModal document created:', savedProductList);
         }
 
-        res.status(200).send('Product added successfully.');
+        // Create a new auction entry
+        const newAuction = new Auction({
+            auction_id: productId, // Use productId as the auction ID
+            auction_start_time: new Date(startDateTime),
+            auction_end_time: new Date(endDateTime),
+            auction_duration: (new Date(endDateTime) - new Date(startDateTime)) / 1000, // Duration in seconds
+            total_bids: 0,
+            highest_bid: 0,
+            starting_price: startingPrice,
+            seller_id: userId,
+            bids: [] // Initialize with an empty bids array
+        });
+
+        const auctionResult = await newAuction.save();
+        console.log('Auction created successfully:', auctionResult);
+
+        res.status(200).send('Product and auction added successfully.');
 
     } catch (error) {
         console.error(error);
         res.status(500).send('Server error.');
     }
 };
+
+
 
 const login = async (req, res) => {
     console.log('Received login request:', req.query);
@@ -316,6 +345,72 @@ const getSellerDetails = async (req, res) => {
 };
 
 
+const placeBid = async (auctionId, bidderId, bidAmount) => {
+    try {
+    
+        // Fetch the auction details
+        const auction = await Auction.findById(auctionId);
+        if (!auction) {
+            throw new Error('Auction not found');
+        }
+
+        // Check if the auction is active
+        const currentTime = new Date();
+        if (currentTime < auction.auction_start_time || currentTime > auction.auction_end_time) {
+            throw new Error('Auction is not active');
+        }
+
+        // Check if the bid is higher than the current highest bid
+        if (bidAmount <= auction.highest_bid) {
+            throw new Error('Bid amount must be higher than the current highest bid');
+        }
+
+        // Fetch the bidder details
+        let bidder = await BiddersAuction.findById(bidderId);
+        if (!bidder) {
+            // If the bidder doesn't exist, create a new record
+            bidder = new BiddersAuction({
+                _id: bidderId,
+                bid_history: new Map()
+            });
+        }
+
+        // Update the auction details
+        auction.highest_bid = bidAmount;
+        auction.total_bids += 1;
+        const existingBid = auction.bids.find(b => b.bidder_id === bidderId);
+        if (existingBid) {
+            existingBid.num_bids += 1;
+            existingBid.last_bid_time = currentTime;
+        } else {
+            auction.bids.push({
+                bidder_id: bidderId,
+                num_bids: 1,
+                first_bid_time: currentTime,
+                last_bid_time: currentTime
+            });
+        }
+
+        // Update the bidder details
+        if (!bidder.bid_history.has(auctionId)) {
+            bidder.total_auctions_participated += 1;
+            bidder.bid_history.set(auctionId, []);
+        }
+        bidder.bid_history.get(auctionId).push({
+            amount: bidAmount,
+            timestamp: currentTime
+        });
+
+        // Save the updated auction and bidder details
+        await auction.save();
+        await bidder.save();
+
+        return { success: true, message: 'Bid placed successfully' };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: error.message };
+    }
+};
 
 
 
@@ -325,6 +420,7 @@ const getSellerDetails = async (req, res) => {
 module.exports = {
     genotp,
     getSellerDetails,
+    placeBid,
     signup,
     login,
     getProfile,
