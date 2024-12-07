@@ -16,6 +16,7 @@ router.get('/login', authController.login);
 router.get('/products', authController.getProductDetails);
 router.get('/profile', authController.getProfile);
 router.get('/getotp', authController.getotp);
+router.get('/sellers/:sellerId', authController.getSellerDetails);
 
 
 

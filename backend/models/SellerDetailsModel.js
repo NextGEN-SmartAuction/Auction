@@ -56,6 +56,10 @@ const sellerDetailsSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    logoName: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,

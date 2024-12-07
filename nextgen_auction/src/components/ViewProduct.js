@@ -5,6 +5,7 @@ import ReactImageMagnify from "react-image-magnify";
 import Slider from "react-slick";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import Countdown from 'react-countdown';
 
 const ViewProduct = () => {
     const { hash } = useParams();
@@ -13,6 +14,10 @@ const ViewProduct = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [bidAmount, setBidAmount] = useState("");
+    const [seller, setSeller] = useState(null); // State for storing seller details
+    const [activeSellerTab, setActiveSellerTab] = useState("profile");
+
+    const handleSellerTabChange = (tab) => setActiveSellerTab(tab);
     const [activeTab, setActiveTab] = useState("placeBid");
     const [selectedImage, setSelectedImage] = useState(null);
     const settings = {
@@ -100,7 +105,64 @@ const ViewProduct = () => {
             backgroundColor: "#f8f9fa", // Light background for the pills section
             borderBottom: "1px solid #ddd",
         },
+        // New styles for the additional information
+        bidCount: {
+            fontSize: "18px",
+            fontWeight: "bold",
+            color: "#28a745", // Green color to indicate a positive value
+        },
+        price: {
+            fontSize: "18px",
+            color: "#6c757d", // Muted gray for price display
+        },
+        countdown: {
+            fontSize: "18px",
+            color: "red", // Setting the color to red
+            textAlign: "center",
+        },
+        priceIncrease: {
+            fontSize: "18px",
+            color: "#ffc107", // Yellow for raise in value
+        },
+        percentageIncrease: {
+            fontSize: "18px",
+            fontWeight: "bold",
+            color: "#dc3545", // Red for percentage increase, as it could signify an important metric
+        },
+        tabTitle: {
+            fontWeight: "bold",
+            color: "#007bff",
+        },
+        tabContent: {
+            fontSize: "16px",
+            color: "#555",
+        },
+        tabLink: {
+            fontSize: "16px",
+            padding: "10px 20px",
+            borderRadius: "30px", // Rounded tabs for modern look
+            transition: "all 0.3s ease",
+        },
+        activeTabLink: {
+            backgroundColor: "#007bff", // Active tab background
+            color: "#fff",
+        },
+        tabContentText: {
+            fontSize: "16px",
+            lineHeight: "1.5",
+            color: "#555",
+        },
+        tabHeader: {
+            fontWeight: "bold",
+            fontSize: "18px",
+            color: "#333",
+            marginBottom: "10px",
+        },
+        tabLinkContainer: {
+            marginTop: "20px",
+        },
     };
+
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -126,6 +188,16 @@ const ViewProduct = () => {
                 setImages(imagesResponse.data.images);
                 setSelectedImage(imagesResponse.data.images[0]);
 
+
+
+
+                // Fetch seller details based on sellerId from the product
+                const sellerResponse = await axios.get(
+                    `${process.env.REACT_APP_ServerUrl}/sellers/${foundProduct.sellerId}`,
+                    { withCredentials: true }
+                );
+                setSeller(sellerResponse.data); // Store the seller data in state
+
                 setLoading(false);
             } catch (err) {
                 console.error("Error fetching product details or images:", err.message);
@@ -145,6 +217,15 @@ const ViewProduct = () => {
         const newBid = highestBid + intervalPrice;
 
         setBidAmount(newBid);
+    };
+
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');  // Pad single digit day
+        const month = String(date.getMonth() + 1).padStart(2, '0');  // Pad single digit month (months are 0-indexed)
+        const year = date.getFullYear();  // Get the full year
+        return `${day}-${month}-${year}`;
     };
 
     const handleSubmitBid = () => {
@@ -218,52 +299,213 @@ const ViewProduct = () => {
                             ))}
                         </Slider>
                     </div>
-                </div>
 
-                {/* Right Column */}
-                <div className="col-6">
+
                     {/* Seller Card */}
-                    <div
-                        className="card mb-3"
-                        style={{ ...styles.sellerCard, ...styles.sellerCardHover }}
-                    >
-                        <div className="card-body d-flex align-items-center">
-                            <img
-                                src={`${process.env.REACT_APP_DataServer}/sellers/${product.sellerLogo}`}
-                                alt="Seller Logo"
-                                style={styles.sellerLogo}
-                            />
-                            <div>
-                                <div style={styles.sellerName}>{product.sellerName}</div>
-                                <div style={styles.sellerCaption}>{product.sellerCaption}</div>
+                    <div className="card mb-3 mt-5 my-5" style={styles.sellerCard}>
+                        <div className="card-header">
+                            <h5 className="ms-3">Seller Details</h5>
+                        </div>
+
+                        <div className="card-body">
+                            <div className="d-flex align-items-center mb-3">
+                                <img
+                                    src={`${process.env.REACT_APP_DataServer}/logos/${seller?.logoName}`}
+                                    alt="Seller Logo"
+                                    style={styles.sellerLogo}
+                                />
+                                <h5 className="ms-3">{seller?.sellerName}</h5>
+                            </div>
+
+                            {/* Navs for Tabs */}
+                            <ul className="nav nav-pills mt-3" id="sellerNav" role="tablist">
+                                <li className="nav-item" role="presentation">
+                                    <a
+                                        className={`nav-link ${activeSellerTab === "profile" ? "active" : ""}`}
+                                        onClick={() => handleSellerTabChange("profile")}
+                                        id="profile-tab"
+                                        data-bs-toggle="pill"
+                                        href="#profile"
+                                        role="tab"
+                                    >
+                                        Profile
+                                    </a>
+                                </li>
+                                <li className="nav-item" role="presentation">
+                                    <a
+                                        className={`nav-link ${activeSellerTab === "moreInfo" ? "active" : ""}`}
+                                        onClick={() => handleSellerTabChange("moreInfo")}
+                                        id="moreInfo-tab"
+                                        data-bs-toggle="pill"
+                                        href="#moreInfo"
+                                        role="tab"
+                                    >
+                                        More Info
+                                    </a>
+                                </li>
+                                <li className="nav-item" role="presentation">
+                                    <a
+                                        className={`nav-link ${activeSellerTab === "contact" ? "active" : ""}`}
+                                        onClick={() => handleSellerTabChange("contact")}
+                                        id="contact-tab"
+                                        data-bs-toggle="pill"
+                                        href="#contact"
+                                        role="tab"
+                                    >
+                                        Contact
+                                    </a>
+                                </li>
+                                <li className="nav-item" role="presentation">
+                                    <a
+                                        className={`nav-link ${activeSellerTab === "address" ? "active" : ""}`}
+                                        onClick={() => handleSellerTabChange("address")}
+                                        id="address-tab"
+                                        data-bs-toggle="pill"
+                                        href="#address"
+                                        role="tab"
+                                    >
+                                        Address
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div className="tab-content mt-3">
+                                {/* Profile Tab */}
+                                <div
+                                    className={`tab-pane fade ${activeSellerTab === "profile" ? "show active" : ""}`}
+                                    id="profile"
+                                    role="tabpanel"
+                                >
+                                    <p className="mb-1"><strong>Display Name:</strong> {seller?.displayName}</p>
+                                    <p><strong>Caption:</strong> {seller?.caption}</p>
+                                </div>
+
+                                {/* More Info Tab */}
+                                <div
+                                    className={`tab-pane fade ${activeSellerTab === "moreInfo" ? "show active" : ""}`}
+                                    id="moreInfo"
+                                    role="tabpanel"
+                                >
+                                    <p><strong>Organization:</strong> {seller?.orgName}</p>
+                                    <p><strong>Website:</strong> <a href={seller?.website} target="_blank" rel="noopener noreferrer">{seller?.website}</a></p>
+                                </div>
+
+                                {/* Contact Tab */}
+                                <div
+                                    className={`tab-pane fade ${activeSellerTab === "contact" ? "show active" : ""}`}
+                                    id="contact"
+                                    role="tabpanel"
+                                >
+                                    <p><strong>Email:</strong> {seller?.email}</p>
+                                    <p><strong>Primary Mobile:</strong> {seller?.primaryMobile}</p>
+                                    <p><strong>Secondary Mobile:</strong> {seller?.secondaryMobile}</p>
+                                </div>
+
+                                {/* Address Tab */}
+                                <div
+                                    className={`tab-pane fade ${activeSellerTab === "address" ? "show active" : ""}`}
+                                    id="address"
+                                    role="tabpanel"
+                                >
+                                    <p><strong>Country:</strong> {seller?.address.country}</p>
+                                    <p><strong>State:</strong> {seller?.address.state}</p>
+                                    <p><strong>City:</strong> {seller?.address.city}</p>
+                                    <p><strong>Pincode:</strong> {seller?.address.pincode}</p>
+                                    <p><strong>Location:</strong> {seller?.address.location}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
+
+
+                {/* Right Column */}
+                <div className="col-6">
                     {/* Highest Bid & Product Details */}
                     <div className="row">
-                        <div className="col-6">
+                        <div className="col-8">
                             <div className="card mb-3" style={styles.card}>
                                 <h4>Product Details</h4>
                                 <p><strong>Category:</strong> {product.category}</p>
                                 <p><strong>Sub-category:</strong> {product.subCategory}</p>
                                 <p><strong>Description:</strong> {product.description}</p>
+                                <p><strong>Start date:</strong> {formatDate(product.startDateTime)}</p>
+                                <p><strong>End date:</strong> {formatDate(product.endDateTime)}</p>
                             </div>
                         </div>
 
                         <div className="col-4">
                             <div className="card mb-3" style={styles.card}>
-                                <h4>Highest Bid</h4>
-                                <p style={styles.highestBid}>
-                                    ₹{product.highestBid || "No bids yet"}
+                                <h4>Minimum Price</h4>
+                                <p style={styles.price}>
+                                    ₹{product.minimumPrice || 0}
                                 </p>
                             </div>
+
+                            <div className="card mb-3" style={styles.card}>
+                                <h4>Auction Timer</h4>
+                                {/* Countdown Component */}
+                                <Countdown
+                                    date={new Date(product.endDateTime).getTime()} // End date as target
+                                    renderer={({ days, hours, minutes, seconds, completed }) => {
+                                        if (completed) {
+                                            return <p>The timer has ended!</p>; // Message when the countdown ends
+                                        } else {
+                                            return (
+                                                <p style={styles.countdown}>
+                                                    {days}d {String(hours).padStart(2, '0')}h {String(minutes).padStart(2, '0')}m {String(seconds).padStart(2, '0')}s
+                                                </p> // Format time as Xd Xh Xm Xs
+                                            );
+                                        }
+                                    }}
+                                />
+                            </div>
+
+
+
                         </div>
+                        <div className="col-12 d-flex flex-row">
+                            <div className="col-4 p-2">
+
+                                <div className="card mb-3" style={styles.card}>
+                                    <h4>Highest Bid</h4>
+                                    <p style={styles.highestBid}>
+                                        ₹{product.highestBid || "No bids yet"}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="col-4 p-2">
+
+                                <div className="card mb-3" style={styles.card}>
+                                    <h4>No of Bids</h4>
+                                    <p style={styles.bidCount}>{product.numberOfBids || 0}</p>
+                                </div>
+                            </div>
+                            <div className="col-4 p-2">
+                                <div className="card mb-3" style={styles.card}>
+                                    <h4> Increase(%)</h4>
+                                    <p style={styles.percentageIncrease}>
+                                        {product.percentageIncrease ? `${product.percentageIncrease}%` : "N/A"}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+
+
                     </div>
 
                     {/* Pills Navigation in Card Header */}
                     <div className="card mb-3" style={styles.card}>
-                        <div className="card-header  " style={styles.navPillsCardHeader}>
+                        <div className="card-header" style={styles.navPillsCardHeader}>
                             <ul className="nav nav-pills p-2">
                                 {["placeBid", "auctionHistory", "winner", "delivery"].map((tab) => (
                                     <li className="nav-item" key={tab}>
@@ -319,7 +561,10 @@ const ViewProduct = () => {
                         </div>
                     </div>
                 </div>
+
+
             </div>
+
         </div>
     );
 };

@@ -118,7 +118,7 @@ const SellerOnboarding = () => {
         setStep(step - 1);
     };
 
-    const uploadLogo = async (file, userName, originalName) => {
+    const uploadLogo = async (file, userName) => {
         const formData = new FormData();
         formData.append("file", file); // The file input from the user
         formData.append("username", userName); // Username of the user
@@ -144,38 +144,38 @@ const SellerOnboarding = () => {
     
     
 
-    
     const handleSubmit = async (e) => {
         e.preventDefault();
     
         try {
-            // Extract UserName from form data
-            const userName = form.userName; // Access UserName directly from the form object
-            const originalName = form.logo; 
-            console.log("UserName:", userName);
-        
-            // Check if userName exists
+            const userName = form.userId; // Ensure userId exists
             if (!userName) {
-                toast.error("UserName is required!");
+                toast.error("userid is required!");
                 return;
             }
     
-            // First, upload the logo file if provided
+            let logoName = ""; // Initialize logoName dynamically
             if (logoFile) {
-                await uploadLogo(logoFile, userName,originalName);
+                logoName = `${userName}`;
+                console.log("Generated Logo Name:", logoName);
+    
+                await uploadLogo(logoFile, logoName); // Upload logo with generated name
             }
     
-            console.log("Final form data:", form);
+            const finalForm = { ...form, logoName }; // Add logoName dynamically to form
+            console.log("Final Form Data:", finalForm);
     
-            // Submit the form data
-            const signupResponse = await signup(form);
-            console.log("Signup successful:", signupResponse);
+            const signupResponse = await signup(finalForm); // Submit form data
+            console.log("Signup Successful:", signupResponse);
             toast.success("Form submitted successfully!");
         } catch (error) {
             console.error("Error in form submission:", error);
             toast.error("Form submission failed!");
         }
     };
+    
+    
+    
     
     
     

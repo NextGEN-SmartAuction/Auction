@@ -85,6 +85,7 @@ const signup = async (req, res) => {
                 website: req.body.website,
                 orgName: req.body.orgName,
                 caption: req.body.caption,
+                logoName : req.body.logoName,
                 email: req.body.email,
                 primaryMobile: req.body.primaryMobile,
                 secondaryMobile: req.body.secondaryMobile,
@@ -295,6 +296,25 @@ const getProfile = (req, res) => {
 };
 
 
+const getSellerDetails = async (req, res) => {
+    try {
+        const sellerId = req.params.sellerId;  // Get sellerId from the request parameters
+
+        // Find the seller by sellerId in the database
+        const seller = await SellerDetailsModel.findOne({ sellerId });
+
+        if (!seller) {
+            return res.status(404).json({ message: "Seller not found" });
+        }
+
+        // Respond with the seller details
+        res.status(200).json(seller);
+    } catch (err) {
+        console.error("Error fetching seller details:", err);
+        res.status(500).json({ message: "Failed to fetch seller details" });
+    }
+};
+
 
 
 
@@ -304,6 +324,7 @@ const getProfile = (req, res) => {
 
 module.exports = {
     genotp,
+    getSellerDetails,
     signup,
     login,
     getProfile,
