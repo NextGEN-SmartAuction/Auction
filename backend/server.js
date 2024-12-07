@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 
 const mongoose = require('mongoose');
 mongoose
-    .connect(process.env.REACT_APP_Mongolink)
+    .connect(process.env.REACT_APP_MongoLink)
     .then(() => {
         console.log('Connected to MongoDB');
         const port = 5000;
