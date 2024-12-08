@@ -33,140 +33,34 @@ const ViewProduct = () => {
         slidesToScroll: 3
     };
 
-    const styles = {
-        highestBid: {
-            fontSize: "22px",
-            fontWeight: "bold",
-            color: "#007bff",
-        },
-        card: {
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-            marginBottom: "20px", // Ensure some space between the card and product details
-            padding: "20px",
-            backgroundColor: "#fff",
-        },
-        sellerCard: {
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-            padding: "15px",
-            backgroundColor: "#fff",
-            marginBottom: "20px", // Space between the card and product details
-            transition: "box-shadow 0.3s ease",
-        },
-        sellerCardHover: {
-            boxShadow: "0 4px 20px rgba(0, 123, 255, 0.3)",
-        },
-        sellerLogo: {
-            width: "50px",
-            height: "50px",
-            objectFit: "cover",
-            borderRadius: "50%",
-            marginRight: "15px",
-        },
-        sellerInfo: {
-            display: "flex",
-            alignItems: "center",
-        },
-        sellerName: {
-            fontSize: "18px",
-            fontWeight: "bold",
-        },
-        sellerCaption: {
-            fontSize: "14px",
-            color: "#6c757d",
-        },
-        intervalPrice: {
-            fontSize: "14px",
-            color: "#6c757d",
-            marginTop: "10px",
-        },
-        bidInput: {
-            fontSize: "16px",
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #ddd",
-        },
-        bidButton: {
-            padding: "10px 20px",
-            fontSize: "16px",
-            borderRadius: "8px",
-            marginTop: "10px",
-        },
-        bidContainer: {
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-        },
-        buttonGroup: {
-            display: "flex",
-            justifyContent: "space-between", // Align the buttons side by side
-            gap: "10px",
-        },
-        navPillsCardHeader: {
-            padding: "0.5rem 1rem",
-            backgroundColor: "#f8f9fa", // Light background for the pills section
-            borderBottom: "1px solid #ddd",
-        },
-        // New styles for the additional information
-        bidCount: {
-            fontSize: "18px",
-            fontWeight: "bold",
-            color: "#28a745", // Green color to indicate a positive value
-        },
-        price: {
-            fontSize: "18px",
-            color: "#6c757d", // Muted gray for price display
-        },
-        countdown: {
-            fontSize: "18px",
-            color: "red", // Setting the color to red
-            textAlign: "center",
-        },
-        priceIncrease: {
-            fontSize: "18px",
-            color: "#ffc107", // Yellow for raise in value
-        },
-        percentageIncrease: {
-            fontSize: "18px",
-            fontWeight: "bold",
-            color: "#dc3545", // Red for percentage increase, as it could signify an important metric
-        },
-        tabTitle: {
-            fontWeight: "bold",
-            color: "#007bff",
-        },
-        tabContent: {
-            fontSize: "16px",
-            color: "#555",
-        },
-        tabLink: {
-            fontSize: "16px",
-            padding: "10px 20px",
-            borderRadius: "30px", // Rounded tabs for modern look
-            transition: "all 0.3s ease",
-        },
-        activeTabLink: {
-            backgroundColor: "#007bff", // Active tab background
-            color: "#fff",
-        },
-        tabContentText: {
-            fontSize: "16px",
-            lineHeight: "1.5",
-            color: "#555",
-        },
-        tabHeader: {
-            fontWeight: "bold",
-            fontSize: "18px",
-            color: "#333",
-            marginBottom: "10px",
-        },
-        tabLinkContainer: {
-            marginTop: "20px",
-        },
-    };
+
+
+    const [socketInfo, setSocketInfo] = useState({
+        highestBid: "Loading...",
+        numberOfBids: "Loading...",
+        percentageIncrease: "Loading...",
+    });
+
+    useEffect(() => {
+        const productId = atob(hash);
+
+        const eventSource = new EventSource(`http://localhost:5003/auction/${productId}/updates`);
+
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setSocketInfo(data);
+        };
+
+        eventSource.onerror = (error) => {
+            console.error("SSE error:", error);
+            eventSource.close(); // Close connection on error
+        };
+
+        return () => {
+            eventSource.close();
+        };
+    }, [hash]);
+   
 
 
     useEffect(() => {
@@ -557,7 +451,7 @@ const ViewProduct = () => {
                                 <div className="card mb-3" style={styles.card}>
                                     <h4>Highest Bid</h4>
                                     <p style={styles.highestBid}>
-                                        ₹{product.highestBid || "No bids yet"}
+                                        ₹{socketInfo.highestBid}
                                     </p>
                                 </div>
                             </div>
@@ -565,14 +459,14 @@ const ViewProduct = () => {
 
                                 <div className="card mb-3" style={styles.card}>
                                     <h4>No of Bids</h4>
-                                    <p style={styles.bidCount}>{product.numberOfBids || 0}</p>
+                                    <p style={styles.bidCount}>{socketInfo.numberOfBids|| 0}</p>
                                 </div>
                             </div>
                             <div className="col-4 p-2">
                                 <div className="card mb-3" style={styles.card}>
                                     <h4> Increase(%)</h4>
                                     <p style={styles.percentageIncrease}>
-                                        {product.percentageIncrease ? `${product.percentageIncrease}%` : "N/A"}
+                                        {socketInfo.percentageIncrease ? `${socketInfo.percentageIncrease}%` : "N/A"}
                                     </p>
                                 </div>
                             </div>
@@ -659,3 +553,140 @@ const ViewProduct = () => {
 };
 
 export default ViewProduct;
+
+
+
+const styles = {
+    highestBid: {
+        fontSize: "22px",
+        fontWeight: "bold",
+        color: "#007bff",
+    },
+    card: {
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+        marginBottom: "20px", // Ensure some space between the card and product details
+        padding: "20px",
+        backgroundColor: "#fff",
+    },
+    sellerCard: {
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+        padding: "15px",
+        backgroundColor: "#fff",
+        marginBottom: "20px", // Space between the card and product details
+        transition: "box-shadow 0.3s ease",
+    },
+    sellerCardHover: {
+        boxShadow: "0 4px 20px rgba(0, 123, 255, 0.3)",
+    },
+    sellerLogo: {
+        width: "50px",
+        height: "50px",
+        objectFit: "cover",
+        borderRadius: "50%",
+        marginRight: "15px",
+    },
+    sellerInfo: {
+        display: "flex",
+        alignItems: "center",
+    },
+    sellerName: {
+        fontSize: "18px",
+        fontWeight: "bold",
+    },
+    sellerCaption: {
+        fontSize: "14px",
+        color: "#6c757d",
+    },
+    intervalPrice: {
+        fontSize: "14px",
+        color: "#6c757d",
+        marginTop: "10px",
+    },
+    bidInput: {
+        fontSize: "16px",
+        padding: "10px",
+        borderRadius: "8px",
+        border: "1px solid #ddd",
+    },
+    bidButton: {
+        padding: "10px 20px",
+        fontSize: "16px",
+        borderRadius: "8px",
+        marginTop: "10px",
+    },
+    bidContainer: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+    },
+    buttonGroup: {
+        display: "flex",
+        justifyContent: "space-between", // Align the buttons side by side
+        gap: "10px",
+    },
+    navPillsCardHeader: {
+        padding: "0.5rem 1rem",
+        backgroundColor: "#f8f9fa", // Light background for the pills section
+        borderBottom: "1px solid #ddd",
+    },
+    // New styles for the additional information
+    bidCount: {
+        fontSize: "18px",
+        fontWeight: "bold",
+        color: "#28a745", // Green color to indicate a positive value
+    },
+    price: {
+        fontSize: "18px",
+        color: "#6c757d", // Muted gray for price display
+    },
+    countdown: {
+        fontSize: "18px",
+        color: "red", // Setting the color to red
+        textAlign: "center",
+    },
+    priceIncrease: {
+        fontSize: "18px",
+        color: "#ffc107", // Yellow for raise in value
+    },
+    percentageIncrease: {
+        fontSize: "18px",
+        fontWeight: "bold",
+        color: "#dc3545", // Red for percentage increase, as it could signify an important metric
+    },
+    tabTitle: {
+        fontWeight: "bold",
+        color: "#007bff",
+    },
+    tabContent: {
+        fontSize: "16px",
+        color: "#555",
+    },
+    tabLink: {
+        fontSize: "16px",
+        padding: "10px 20px",
+        borderRadius: "30px", // Rounded tabs for modern look
+        transition: "all 0.3s ease",
+    },
+    activeTabLink: {
+        backgroundColor: "#007bff", // Active tab background
+        color: "#fff",
+    },
+    tabContentText: {
+        fontSize: "16px",
+        lineHeight: "1.5",
+        color: "#555",
+    },
+    tabHeader: {
+        fontWeight: "bold",
+        fontSize: "18px",
+        color: "#333",
+        marginBottom: "10px",
+    },
+    tabLinkContainer: {
+        marginTop: "20px",
+    },
+};
