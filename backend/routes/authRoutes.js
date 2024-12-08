@@ -15,7 +15,9 @@ router.post('/addProduct', authController.addProduct);
 router.get('/login', authController.login);
 router.get('/products', authController.getProductDetails);
 router.get('/profile', authController.getProfile);
+router.get('/getFlaskInfo', authController.getFlaskInfo);
 router.get('/getotp', authController.getotp);
+router.post('/placeBid', authController.placeBid);
 router.get('/sellers/:sellerId', authController.getSellerDetails);
 
 

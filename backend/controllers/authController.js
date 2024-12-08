@@ -210,6 +210,7 @@ const addProduct = async (req, res) => {
             productName: req.body.productName,
             description: req.body.description,
             productStatus: productStatus || 'unsold',
+            logoImageName:req.body.logoImageName,
             auctionStatus: auctionStatus || 'upcoming',
             winner: 'tbd', // Default winner to 'tbd'
         });
@@ -252,7 +253,7 @@ const addProduct = async (req, res) => {
             auction_duration: (new Date(endDateTime) - new Date(startDateTime)) / 1000, // Duration in seconds
             total_bids: 0,
             highest_bid: 0,
-            starting_price: startingPrice,
+            starting_price: minimumPrice,
             seller_id: userId,
             bids: [] // Initialize with an empty bids array
         });
@@ -345,81 +346,178 @@ const getSellerDetails = async (req, res) => {
 };
 
 
-const placeBid = async (auctionId, bidderId, bidAmount) => {
+
+const placeBid = async (req, res) => {
+    const { auctionId, bidderId, bidAmount } = req.body;
+
     try {
-    
         // Fetch the auction details
-        const auction = await Auction.findById(auctionId);
+        const auction = await Auction.findOne({ auction_id: auctionId });
         if (!auction) {
-            throw new Error('Auction not found');
+            return res.status(404).json({ success: false, message: 'Auction not found' });
         }
 
         // Check if the auction is active
         const currentTime = new Date();
         if (currentTime < auction.auction_start_time || currentTime > auction.auction_end_time) {
-            throw new Error('Auction is not active');
+            return res.status(400).json({ success: false, message: 'Auction is not active' });
         }
 
-        // Check if the bid is higher than the current highest bid
+        // Check if the bid amount is valid
         if (bidAmount <= auction.highest_bid) {
-            throw new Error('Bid amount must be higher than the current highest bid');
-        }
-
-        // Fetch the bidder details
-        let bidder = await BiddersAuction.findById(bidderId);
-        if (!bidder) {
-            // If the bidder doesn't exist, create a new record
-            bidder = new BiddersAuction({
-                _id: bidderId,
-                bid_history: new Map()
+            return res.status(400).json({
+                success: false,
+                message: 'Bid amount must be higher than the current highest bid',
             });
         }
 
-        // Update the auction details
+        // Fetch or create the bidder details
+        let bidder = await BiddersAuction.findOne({ bidder_id: bidderId });
+        if (!bidder) {
+            bidder = new BiddersAuction({
+                bidder_id: bidderId,
+                total_starting_price: 0,
+                total_auctions_participated: 0,
+                starting_price_average: 0,
+                bid_history: new Map(),
+            });
+        }
+
+        // If the bidder is new to this auction, update their starting price stats
+        if (!bidder.bid_history.has(auctionId)) {
+            bidder.total_auctions_participated += 1;
+            bidder.total_starting_price += auction.starting_price;
+            bidder.starting_price_average =
+                bidder.total_starting_price / bidder.total_auctions_participated;
+            bidder.bid_history.set(auctionId, []);
+        }
+
+        // Calculate bid times in seconds relative to auction_start_time
+        const auctionStartTime = new Date(auction.auction_start_time).getTime();
+        const bidTimeInSeconds = Math.floor((currentTime.getTime() - auctionStartTime) / 1000);
+
+        // Check if the current bidder is the highest bidder and increment self-outbids if necessary
+        const existingBid = auction.bids.find((b) => b.bidder_id === bidderId);
+        if (auction.highest_bidder_id === bidderId) {
+            if (existingBid) {
+                existingBid.self_outbids += 1;
+            }
+        }
+
+        // Update auction details
         auction.highest_bid = bidAmount;
+        auction.highest_bidder_id = bidderId;
         auction.total_bids += 1;
-        const existingBid = auction.bids.find(b => b.bidder_id === bidderId);
+
         if (existingBid) {
             existingBid.num_bids += 1;
-            existingBid.last_bid_time = currentTime;
+            existingBid.last_bid_time = bidTimeInSeconds;
         } else {
             auction.bids.push({
                 bidder_id: bidderId,
                 num_bids: 1,
-                first_bid_time: currentTime,
-                last_bid_time: currentTime
+                self_outbids: 0,
+                first_bid_time: bidTimeInSeconds,
+                last_bid_time: bidTimeInSeconds,
             });
         }
 
-        // Update the bidder details
-        if (!bidder.bid_history.has(auctionId)) {
-            bidder.total_auctions_participated += 1;
-            bidder.bid_history.set(auctionId, []);
-        }
+        // Update bidder's bid history
         bidder.bid_history.get(auctionId).push({
             amount: bidAmount,
-            timestamp: currentTime
+            timestamp: currentTime,
         });
 
-        // Save the updated auction and bidder details
+        // Save changes
         await auction.save();
         await bidder.save();
 
-        return { success: true, message: 'Bid placed successfully' };
+        return res.status(200).json({
+            success: true,
+            message: 'Bid placed successfully',
+        });
     } catch (error) {
         console.error(error);
-        return { success: false, message: error.message };
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message,
+        });
     }
 };
 
 
+const getFlaskInfo = async (req, res) => {
+    try {
+        // Fetch all auctions and bidders
+        const auctions = await Auction.find({});
+        const bidders = await BiddersAuction.find({});
 
+        // Create a mapping for quick bidder lookup
+        const bidderMap = {};
+        bidders.forEach((bidder) => {
+            bidderMap[bidder.bidder_id] = {
+                winning_ratio: bidder.winning_ratio,
+                starting_price_average: bidder.starting_price_average,
+            };
+        });
+
+        const dataForModel = [];
+        auctions.forEach((auction) => {
+            auction.bids.forEach((bid) => {
+                const bidderData = bidderMap[bid.bidder_id] || {
+                    winning_ratio: 0,
+                    starting_price_average: 0,
+                };
+
+                // Calculate Bidder Tendency
+                const totalAuctionCount = auctions.filter((a) =>
+                    a.bids.some((b) => b.bidder_id === bid.bidder_id)
+                ).length;
+
+                const sameSellerAuctionCount = auctions.filter(
+                    (a) =>
+                        a.seller_id === auction.seller_id &&
+                        a.bids.some((b) => b.bidder_id === bid.bidder_id)
+                ).length;
+
+                const bidderTendency = sameSellerAuctionCount / (totalAuctionCount || 1);
+
+                dataForModel.push({
+                    bidder_tendency: bidderTendency,
+                    bidding_ratio: bid.num_bids / (auction.total_bids || 1),
+                    successive_outbidding: bid.self_outbids / (bid.num_bids || 1),
+                    last_bidding: 1 - (bid.last_bid_time / auction.auction_duration),
+                    early_bidding: bid.first_bid_time / auction.auction_duration,
+                    auction_bids: auction.total_bids,
+                    starting_price_average: bidderData.starting_price_average,
+                    winning_ratio: bidderData.winning_ratio,
+                    auction_duration: auction.auction_duration,
+                });
+            });
+        });
+
+        // Send the response
+        return res.status(200).json({
+            success: true,
+            data: dataForModel,
+        });
+    } catch (error) {
+        console.error("Error fetching data for model:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch auction and bidder data",
+            error: error.message,
+        });
+    }
+};
 
 
 
 module.exports = {
     genotp,
     getSellerDetails,
+    getFlaskInfo,
     placeBid,
     signup,
     login,

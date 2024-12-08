@@ -229,6 +229,11 @@ function AddProduct() {
             toast.error('Please fill in all required fields!');
             return;
         }
+          // Get the file extension of the primary image
+        const primaryImageExtension = primaryImage.split('.').pop(); // Extracts the extension (e.g., 'jpeg')
+        
+        // Create the logo name using userId and the original image extension
+        const logoImageName = `${productId}_P.${primaryImageExtension}`;
 
         // Prepare the form data for the first API call
         const formData = {
@@ -247,6 +252,7 @@ function AddProduct() {
             productName,
             description,
             productStatus,
+            logoImageName,
             auctionStatus,
             primaryImage,
             otherImages: imageList.filter((image) => image.name !== primaryImage).map((img) => img.name),

@@ -9,7 +9,6 @@ const productDetailsSchema = new mongoose.Schema({
     sellerId: {
         type: String,
         required: true,
-        unique: true, // Ensure productId is unique
     },
     
     noOfParts: {
@@ -59,6 +58,10 @@ const productDetailsSchema = new mongoose.Schema({
     productStatus: {
         type: String,
         default: 'unsold', // Default value
+    },
+    logoImageName:{
+        type: String,
+        required: true,
     },
     auctionStatus: {
         type: String,

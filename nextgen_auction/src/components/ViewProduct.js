@@ -6,6 +6,11 @@ import Slider from "react-slick";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Countdown from 'react-countdown';
+import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const ViewProduct = () => {
     const { hash } = useParams();
@@ -219,6 +224,30 @@ const ViewProduct = () => {
         setBidAmount(newBid);
     };
 
+    const [username, setUsername] = useState(null);
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        const jwtToken = Cookies.get('jwt');
+        if (jwtToken) {
+            const checkAuthenticationStatus = async () => {
+                try {
+                    const response = await axios.get(
+                        `${process.env.REACT_APP_ServerUrl}/profile`,
+                        { withCredentials: true }
+                    );
+                    const { username ,userId} = response.data;
+                    setUsername(username);
+                    setUserId(userId);
+                } catch (error) {
+                    console.error('Authentication check failed:', error);
+                }
+            };
+            checkAuthenticationStatus();
+        }
+    }, []);
+
+
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -228,11 +257,68 @@ const ViewProduct = () => {
         return `${day}-${month}-${year}`;
     };
 
-    const handleSubmitBid = () => {
-        console.log("Bid Submitted:");
-        console.log("Bid Amount:", bidAmount);
-        console.log("Product Details:", product);
+    const handleSubmitBid = async () => {
+        // Input validation
+        if (!bidAmount || bidAmount <= 0) {
+            toast.error("Please enter a valid bid amount.");
+            return;
+        }
+    
+        if (!product?.productId) {
+            toast.error("Auction ID is missing.");
+            return;
+        }
+    
+        if (!userId) {
+            toast.error("User ID is missing.");
+            return;
+        }
+    
+        try {
+            console.log("Bid Submitted:");
+            console.log("Bid Amount:", bidAmount);
+            console.log("Auction ID:", product.productId);
+            console.log("User ID:", userId);
+    
+            const response = await axios.post(
+                `${process.env.REACT_APP_ServerUrl}/placeBid`,
+                {
+                    auctionId: product.productId,
+                    bidderId: userId,
+                    bidAmount: bidAmount,
+                },
+                { withCredentials: true }
+            );
+    
+            console.log(response);
+    
+            if (response.data.success) {
+                console.log("Bid placed successfully:", response.data.message);
+                toast.success(`Bid placed successfully: ${response.data.message}`);
+            } else {
+                console.error("Failed to place bid:", response.data.message);
+                toast.error(`Failed to place bid: ${response.data.message}`);
+            }
+        } catch (error) {
+            if (error.response) {
+                // Server responded with a status code outside the 2xx range
+                console.error("Server Error:", error.response.data);
+                toast.error(
+                    `Failed to place bid: ${error.response.data.message || "Unknown error"}`
+                );
+            } else if (error.request) {
+                // No response was received
+                console.error("Network Error: No response received", error.request);
+                toast.error("Network error: Unable to reach the server.");
+            } else {
+                // Something else caused the error
+                console.error("Error:", error.message);
+                toast.error(`An error occurred: ${error.message}`);
+            }
+        }
     };
+    
+    
 
     if (loading) {
         return (
@@ -564,6 +650,9 @@ const ViewProduct = () => {
 
 
             </div>
+
+            <ToastContainer />
+
 
         </div>
     );

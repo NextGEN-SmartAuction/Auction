@@ -56,6 +56,12 @@ const AuctionSchema = new mongoose.Schema({
         default: 0
 
     },
+    highest_bidder_id: {
+        type: String,
+        default: null
+    },
+      
+    
     starting_price: {
         type: Number,
         default: 0
@@ -66,6 +72,7 @@ const AuctionSchema = new mongoose.Schema({
         required: true
 
     },
+
     bids: [BidSchema] // Use the Bid sub-schema here
 }, { versionKey: false }); // Disable versionKey for the main schema
 

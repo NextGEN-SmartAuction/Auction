@@ -65,7 +65,7 @@ const AuctionItems = () => {
                 {items.map((product) => (
                     <div key={product.productId} style={styles.card}>
                         <img
-                            src={`${process.env.REACT_APP_DataServer}/products/${product.productId}_p.jpeg`}
+                            src={`${process.env.REACT_APP_DataServer}/products/${product.logoImageName}`}
                             alt={product.productName}
                             style={styles.image}
                         />
