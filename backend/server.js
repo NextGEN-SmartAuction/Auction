@@ -38,10 +38,10 @@ app.use((req, res, next) => {
 
 const mongoose = require('mongoose');
 mongoose
-    .connect(process.env.REACT_APP_MongoLink)
+    .connect("mongodb+srv://vishnudath710:vishnudath@patch-management.0uewar4.mongodb.net/NextgenAuction")
     .then(() => {
         console.log('Connected to MongoDB');
-        const port = 5000;
+        const port = 8000;
 
         app.use('/', authRoutes);
 
