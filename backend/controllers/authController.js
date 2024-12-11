@@ -9,23 +9,27 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-
+const dotenv = require('dotenv');
 const Auction = require('../models/AuctionModel'); // Adjust the path if needed
 const BiddersAuction = require('../models/BiddersAuctionModel');
 const FormData = require('form-data');
 
 const axios = require('axios');
 
-const maxAge = 3 * 24 * 60 * 60 * 1000;
+const maxAge =  3 * 24 * 60 * 60 * 1000;
 
 var otp1 = 1;
+
+dotenv.config({ path: './.env' });
+
+
 
 
 
 
 
 const generateToken = (user) => {
-    return jwt.sign({ username: user.username ,role:user.role,displayName: user.displayName ,userId :user.userId}, 'secret_key is blash');
+    return jwt.sign({ username: user.username ,role:user.role,displayName: user.displayName ,userId :user.userId},  process.env.REACT_APP_SecretKey);
 };
 
 const getotp = async (req, res) => {
@@ -314,7 +318,7 @@ const getProfile = (req, res) => {
     console.log(token)
     if (token) {
         try {
-            const decoded = jwt.verify(token, 'secret_key is blash');
+            const decoded = jwt.verify(token,  process.env.REACT_APP_SecretKey);
             const { username,role,displayName,userId } = decoded;
             res.json({ username,role ,displayName,userId});
         } catch (err) {
@@ -361,6 +365,65 @@ const placeBid = async (req, res) => {
         const currentTime = new Date();
         if (currentTime < auction.auction_start_time || currentTime > auction.auction_end_time) {
             return res.status(400).json({ success: false, message: 'Auction is not active' });
+        }
+
+
+        // Determine dynamic percentage increment based on the highest bid
+        const getDynamicIncrementPercentage = (highestBid) => {
+
+            if (highestBid < 500) {
+                // Bids below ₹1,000
+                const percentages = [ 200, 250 ,300]; // Subcategories
+                return percentages[Math.floor(Math.random() * percentages.length)];
+            }
+            if (highestBid < 1000) {
+                // Bids below ₹1,000
+                const percentages = [80, 90, 100, 120]; // Subcategories
+                return percentages[Math.floor(Math.random() * percentages.length)];
+            }
+            if (highestBid < 10000) {
+                // Bids ₹1,000–₹10,000
+                const percentages = [40, 50, 60]; // Subcategories
+                return percentages[Math.floor(Math.random() * percentages.length)];
+            }
+            if (highestBid < 100000) {
+                // Bids ₹10,000–₹1,00,000
+                const percentages = [15, 20, 25]; // Subcategories
+                return percentages[Math.floor(Math.random() * percentages.length)];
+            }
+            if (highestBid < 1000000) {
+                // Bids ₹1,00,000–₹10,00,000
+                const percentages = [8, 10, 12]; // Subcategories
+                return percentages[Math.floor(Math.random() * percentages.length)];
+            }
+            if (highestBid < 10000000) {
+                // Bids ₹10,00,000–₹1,00,00,000
+                const percentages = [4, 5, 6]; // Subcategories
+                return percentages[Math.floor(Math.random() * percentages.length)];
+            }
+            // Bids above ₹1,00,00,000
+            const percentages = [1, 2, 3]; // Subcategories
+            return percentages[Math.floor(Math.random() * percentages.length)];
+        };
+
+        // Get the dynamic percentage
+
+        
+        const MAX_INCREMENT_PERCENTAGE = getDynamicIncrementPercentage(auction.highest_bid);
+        console.log(MAX_INCREMENT_PERCENTAGE);
+        console.log(auction.highest_bid);
+
+        // Calculate the valid bid range
+        let minBid = auction.highest_bid === 0 ? auction.starting_price : auction.highest_bid + 1;
+        let maxBid = auction.highest_bid === 0 ? auction.starting_price * (1 + MAX_INCREMENT_PERCENTAGE / 100) : auction.highest_bid * (1 + MAX_INCREMENT_PERCENTAGE / 100);
+
+
+        // Check if the bid amount is within the valid range
+        if (bidAmount < minBid || bidAmount > maxBid) {
+            return res.status(400).json({
+                success: false,
+                message: `Bid amount must be between ₹${minBid.toFixed(2)} and ₹${maxBid.toFixed(2)}.`,
+            });
         }
 
         // Check if the bid amount is valid
@@ -449,11 +512,9 @@ const placeBid = async (req, res) => {
 
 const getFlaskInfo = async (req, res) => {
     try {
-        // Fetch all auctions and bidders
         const auctions = await Auction.find({});
         const bidders = await BiddersAuction.find({});
 
-        // Create a mapping for quick bidder lookup
         const bidderMap = {};
         bidders.forEach((bidder) => {
             bidderMap[bidder.bidder_id] = {
@@ -462,15 +523,18 @@ const getFlaskInfo = async (req, res) => {
             };
         });
 
-        const dataForModel = [];
+        const auctionData = {};
+
         auctions.forEach((auction) => {
+            const auctionId = auction.auction_id;
+            auctionData[auctionId] = auctionData[auctionId] || [];
+
             auction.bids.forEach((bid) => {
                 const bidderData = bidderMap[bid.bidder_id] || {
                     winning_ratio: 0,
                     starting_price_average: 0,
                 };
 
-                // Calculate Bidder Tendency
                 const totalAuctionCount = auctions.filter((a) =>
                     a.bids.some((b) => b.bidder_id === bid.bidder_id)
                 ).length;
@@ -483,7 +547,7 @@ const getFlaskInfo = async (req, res) => {
 
                 const bidderTendency = sameSellerAuctionCount / (totalAuctionCount || 1);
 
-                dataForModel.push({
+                auctionData[auctionId].push({
                     bidder_tendency: bidderTendency,
                     bidding_ratio: bid.num_bids / (auction.total_bids || 1),
                     successive_outbidding: bid.self_outbids / (bid.num_bids || 1),
@@ -497,10 +561,9 @@ const getFlaskInfo = async (req, res) => {
             });
         });
 
-        // Send the response
         return res.status(200).json({
             success: true,
-            data: dataForModel,
+            data: auctionData,
         });
     } catch (error) {
         console.error("Error fetching data for model:", error.message);
@@ -511,6 +574,7 @@ const getFlaskInfo = async (req, res) => {
         });
     }
 };
+
 
 
 

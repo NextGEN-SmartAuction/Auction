@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: process.env.REACT_APP_MainServer,
     methods: 'GET, POST, PUT, DELETE',
     credentials: true,  // Add this line to allow credentials
     allowedHeaders: 'Content-Type, Authorization',
@@ -26,7 +26,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Origin', process.env.REACT_APP_MainServer);
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
@@ -34,6 +34,9 @@ app.use((req, res, next) => {
 
 
 
+app.get('/hello', (req, res) => {
+    res.send('Hello World!');
+});
 
 
 const mongoose = require('mongoose');
@@ -41,7 +44,7 @@ mongoose
     .connect(process.env.REACT_APP_MongoLink)
     .then(() => {
         console.log('Connected to MongoDB');
-        const port = 5000;
+        const port = process.env.REACT_APP_ServerPort;
 
         app.use('/', authRoutes);
 

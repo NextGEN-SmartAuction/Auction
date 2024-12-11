@@ -36,31 +36,44 @@ const ViewProduct = () => {
 
 
     const [socketInfo, setSocketInfo] = useState({
-        highestBid: "Loading...",
+        highestBid: 0,
+        highestBidder: "Loading...", // Added highestBidder to the state
         numberOfBids: "Loading...",
-        percentageIncrease: "Loading...",
+        percentageIncrease: 0,
     });
 
     useEffect(() => {
-        const productId = atob(hash);
+        const productId = atob(hash); // Decode the productId from hash
 
-        const eventSource = new EventSource(`http://localhost:5003/auction/${productId}/updates`);
+        const eventSource = new EventSource(`${process.env.REACT_APP_SseServerUrl}/auction/${productId}/updates`);
 
+        // alert(`http://${process.env.REACT_APP_SseServerUrl}/auction/${productId}/updates`)
+
+        // Handle incoming SSE messages
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            setSocketInfo(data);
+
+            // Update state with new auction information
+            setSocketInfo({
+                highestBid: data.highestBid || 0,
+                highestBidder: data.highestBidder || "No bids !!!",
+                numberOfBids: data.numberOfBids || 0,
+                percentageIncrease: data.percentageIncrease || 0,
+            });
         };
 
+        // Handle SSE errors
         eventSource.onerror = (error) => {
             console.error("SSE error:", error);
             eventSource.close(); // Close connection on error
         };
 
+        // Cleanup: close the EventSource connection when the component unmounts
         return () => {
             eventSource.close();
         };
-    }, [hash]);
-   
+    }, [hash]); // Re-run effect if hash changes
+
 
 
     useEffect(() => {
@@ -111,7 +124,7 @@ const ViewProduct = () => {
     const handleTabChange = (tab) => setActiveTab(tab);
 
     const handleAddInterval = () => {
-        const highestBid = parseFloat(product.highestBid || product.minimumPrice);
+        const highestBid = parseFloat(socketInfo.highestBid || product.minimumPrice);
         const intervalPrice = parseFloat(product.priceInterval || 0);
         const newBid = highestBid + intervalPrice;
 
@@ -130,7 +143,7 @@ const ViewProduct = () => {
                         `${process.env.REACT_APP_ServerUrl}/profile`,
                         { withCredentials: true }
                     );
-                    const { username ,userId} = response.data;
+                    const { username, userId } = response.data;
                     setUsername(username);
                     setUserId(userId);
                 } catch (error) {
@@ -157,23 +170,23 @@ const ViewProduct = () => {
             toast.error("Please enter a valid bid amount.");
             return;
         }
-    
+
         if (!product?.productId) {
             toast.error("Auction ID is missing.");
             return;
         }
-    
+
         if (!userId) {
             toast.error("User ID is missing.");
             return;
         }
-    
+
         try {
             console.log("Bid Submitted:");
             console.log("Bid Amount:", bidAmount);
             console.log("Auction ID:", product.productId);
             console.log("User ID:", userId);
-    
+
             const response = await axios.post(
                 `${process.env.REACT_APP_ServerUrl}/placeBid`,
                 {
@@ -183,9 +196,9 @@ const ViewProduct = () => {
                 },
                 { withCredentials: true }
             );
-    
+
             console.log(response);
-    
+
             if (response.data.success) {
                 console.log("Bid placed successfully:", response.data.message);
                 toast.success(`Bid placed successfully: ${response.data.message}`);
@@ -211,8 +224,8 @@ const ViewProduct = () => {
             }
         }
     };
-    
-    
+
+
 
     if (loading) {
         return (
@@ -447,19 +460,22 @@ const ViewProduct = () => {
                         </div>
                         <div className="col-12 d-flex flex-row">
                             <div className="col-4 p-2">
-
                                 <div className="card mb-3" style={styles.card}>
                                     <h4>Highest Bid</h4>
                                     <p style={styles.highestBid}>
                                         ₹{socketInfo.highestBid}
                                     </p>
+                                    <p style={{ fontSize: '0.9rem', color: '#6c757d', marginTop: '5px' }}>
+                                        {socketInfo.highestBidder ? `Bidder: ${socketInfo.highestBidder}` : "Bidder: Loading..."}
+                                    </p>
                                 </div>
                             </div>
+
                             <div className="col-4 p-2">
 
                                 <div className="card mb-3" style={styles.card}>
                                     <h4>No of Bids</h4>
-                                    <p style={styles.bidCount}>{socketInfo.numberOfBids|| 0}</p>
+                                    <p style={styles.bidCount}>{socketInfo.numberOfBids || 0}</p>
                                 </div>
                             </div>
                             <div className="col-4 p-2">

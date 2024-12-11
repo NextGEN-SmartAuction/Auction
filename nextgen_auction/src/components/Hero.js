@@ -29,6 +29,10 @@ const Hero = () => {
     };
 
     return (
+        <>
+        <div className=" text-center mt-4">
+            <h3>Welcome To NextGEn Bid</h3>
+        </div>
         <div
             style={{
                 width: "100%",
@@ -117,6 +121,7 @@ const Hero = () => {
                 &#8250;
             </button>
         </div>
+        </>
     );
 };
 

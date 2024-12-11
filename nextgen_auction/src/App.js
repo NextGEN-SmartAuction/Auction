@@ -62,27 +62,12 @@ function App() {
             case 'seller':
                 return (
                     <Routes>
-                        <Route
-                            path="/seller"
-                            element={
-                                <>
-                                    <SellerDashBoard />
-                                    <Hero />
-                                </>
-                            }
-                        />
-                        <Route path="/seller/*" element={<SellerDashBoard />} />
-                        <Route
-                            path="/seller/AddProduct"
-                            element={
-                                <>
-                                    <SellerDashBoard />
-
-                                    <AddProduct />
-                                </>
-                            }
-                        />
-                        {/* Add more seller-specific routes here */}
+                        <Route path="/seller" element={<SellerDashBoard />}>
+                            <Route index element={<Hero />} />
+                            <Route path="AddProduct" element={<AddProduct />} />
+                            {/* <Route path="MyProducts" element={<MyProducts />} />
+                            <Route path="WinnersList" element={<WinnersList />} /> */}
+                        </Route>
                     </Routes>
                 );
 

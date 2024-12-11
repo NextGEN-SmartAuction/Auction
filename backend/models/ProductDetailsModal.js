@@ -59,13 +59,22 @@ const productDetailsSchema = new mongoose.Schema({
         type: String,
         default: 'unsold', // Default value
     },
+
+    shillBiddingStatus: {
+        type: String,
+        default: 'tbd',
+    },
+    paymentStatus: {
+        type: String,
+        default: 'no_need', 
+    },
     logoImageName:{
         type: String,
         required: true,
     },
     auctionStatus: {
         type: String,
-        enum: ['upcoming', 'ongoing', 'completed'], // Restrict to valid statuses
+        enum: ['upcoming', 'ongoing', 'completed','closed'], // Restrict to valid statuses
         required: true,
     },
     winner: {

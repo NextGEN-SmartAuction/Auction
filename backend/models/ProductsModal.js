@@ -8,12 +8,20 @@ const productSchema = new mongoose.Schema({
     },
     auctionStatus: {
         type: String,
-        enum: ['upcoming', 'ongoing', 'completed'], // Restrict to valid statuses
+        enum: ['upcoming', 'ongoing', 'completed','closed'], // Restrict to valid statuses
         required: true,
     },
     productStatus: {
         type: String,
         default: 'unsold', // Default value
+    },
+    shillBiddingStatus: {
+        type: String,
+        default: 'tbd',
+    },
+    paymentStatus: {
+        type: String,
+        default: 'no_need', 
     }
 }, { _id: false }); // Disable _id generation for the product sub-document
 

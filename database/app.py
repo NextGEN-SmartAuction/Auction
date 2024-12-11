@@ -118,4 +118,6 @@ def get_product_images(product_id):
     return jsonify({"success": True, "images": images}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, port=PORT)  # Use port from .env file
+    app.run(host='0.0.0.0', debug=True, port=PORT)
+
+    # app.run(debug=True, port=PORT)  # Use port from .env file

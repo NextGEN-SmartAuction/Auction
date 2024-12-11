@@ -3,7 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const SellerDashBoard = () => {
     return (
-        <div style={{ display: "flex", flexDirection: "column"}}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
             {/* Fixed Horizontal Navbar */}
             <nav
                 style={{
@@ -12,24 +12,35 @@ const SellerDashBoard = () => {
                     color: "#fff",
                 }}
             >
-                <ul style={{ display: "flex", listStyle: "none"}} className="p-2 d-flex justify-content-evenly">
-                    <li >
+                <ul
+                    style={{
+                        display: "flex",
+                        listStyle: "none",
+                        justifyContent: "space-evenly",
+                        padding: 0,
+                        margin: 0,
+                    }}
+                >
+                    <li>
                         <NavLink
                             to="/seller"
+                            end
                             style={({ isActive }) => ({
                                 textDecoration: "none",
                                 color: isActive ? "#4CAF50" : "#fff",
+                                fontWeight: isActive ? "bold" : "normal",
                             })}
                         >
                             Auction Home
                         </NavLink>
                     </li>
-                    <li >
+                    <li>
                         <NavLink
                             to="/seller/AddProduct"
                             style={({ isActive }) => ({
                                 textDecoration: "none",
                                 color: isActive ? "#4CAF50" : "#fff",
+                                fontWeight: isActive ? "bold" : "normal",
                             })}
                         >
                             Add Product
@@ -41,34 +52,24 @@ const SellerDashBoard = () => {
                             style={({ isActive }) => ({
                                 textDecoration: "none",
                                 color: isActive ? "#4CAF50" : "#fff",
+                                fontWeight: isActive ? "bold" : "normal",
                             })}
                         >
                             My Products
                         </NavLink>
                     </li>
-                    <li >
+                    <li>
                         <NavLink
                             to="/seller/WinnersList"
                             style={({ isActive }) => ({
                                 textDecoration: "none",
                                 color: isActive ? "#4CAF50" : "#fff",
+                                fontWeight: isActive ? "bold" : "normal",
                             })}
                         >
                             Winners List
                         </NavLink>
                     </li>
-                    <li>
-                        <NavLink
-                            to="/seller/orders"
-                            style={({ isActive }) => ({
-                                textDecoration: "none",
-                                color: isActive ? "#4CAF50" : "#fff",
-                            })}
-                        >
-                            View Orders
-                        </NavLink>
-                    </li>
-                    
                 </ul>
             </nav>
 
