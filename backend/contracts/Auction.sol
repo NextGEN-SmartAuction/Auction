@@ -21,18 +21,42 @@ contract Auction {
         string date;
         string time;
         string ipfsHash;
-        string logoImageName; // New parameter
     }
 
     mapping(string => ProductInfo) private products;
     string[] private productIds;
 
     // Add purchase information to the contract
-    function addPurchase(ProductInfo memory product) public onlyadmin {
-        require(bytes(products[product.productId].productId).length == 0, "Product ID already exists");
+    function addPurchase(
+        string memory productId,
+        string memory productName,
+        string memory sellerId,
+        string memory sellerName,
+        string memory bidderId,
+        string memory bidderName,
+        uint256 amount,
+        string memory transactionId,
+        string memory date,
+        string memory time,
+        string memory ipfsHash
+    ) public onlyadmin {
+        require(bytes(products[productId].productId).length == 0, "Product ID already exists");
 
-        products[product.productId] = product;
-        productIds.push(product.productId);
+        products[productId] = ProductInfo({
+            productId: productId,
+            productName: productName,
+            sellerId: sellerId,
+            sellerName: sellerName,
+            bidderId: bidderId,
+            bidderName: bidderName,
+            amount: amount,
+            transactionId: transactionId,
+            date: date,
+            time: time,
+            ipfsHash: ipfsHash
+        });
+
+        productIds.push(productId);
     }
 
     // Get all products

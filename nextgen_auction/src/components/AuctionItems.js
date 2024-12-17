@@ -9,7 +9,9 @@ const AuctionItems = () => {
     const [error, setError] = useState(null);
     const [modalData, setModalData] = useState(null);
     const navigate = useNavigate();
+    const [liveData, setLiveData] = useState({});
 
+    // Fetch products and update auction status
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -28,6 +30,51 @@ const AuctionItems = () => {
         fetchProducts();
     }, []);
 
+    useEffect(() => {
+        const eventSources = {};
+    
+        // Filter only ongoing products for SSE
+        const ongoingProducts = products.filter(product => product.auctionStatus === "ongoing");
+    
+        // Iterate over ongoing products and start SSE for each
+        ongoingProducts.forEach((product) => {
+            const eventSource = new EventSource(
+                `${process.env.REACT_APP_SseServerUrl}/auction/${product.productId}/updates`
+            );
+    
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    // Update the liveData state for the specific product
+                    setLiveData((prev) => ({
+                        ...prev,
+                        [product.productId]: {
+                            highestBid: data.highestBid || "No bids yet",
+                            highestBidder: data.highestBidder || "N/A",
+                            numberOfBids: data.numberOfBids || 0,
+                            percentageIncrease: data.percentageIncrease || "N/A",
+                        },
+                    }));
+                } catch (err) {
+                    console.error("Error parsing SSE data:", err);
+                }
+            };
+    
+            eventSource.onerror = (err) => {
+                console.error("SSE connection error:", err);
+                eventSource.close();
+            };
+    
+            eventSources[product.productId] = eventSource;
+        });
+    
+        return () => {
+            // Cleanup on unmount
+            Object.values(eventSources).forEach((source) => source.close());
+        };
+    }, [products]); // Dependency: Only when products change (as ongoing products are derived from this)
+    
     const groupedProducts = {
         ongoing: products.filter((p) => p.auctionStatus === "ongoing"),
         upcoming: products.filter((p) => p.auctionStatus === "upcoming"),
@@ -37,28 +84,76 @@ const AuctionItems = () => {
     const openModal = (product) => setModalData(product);
     const closeModal = () => setModalData(null);
 
-    const renderCountdown = ({ days, hours, minutes, seconds, completed }, isUpcoming) => {
-        if (completed) {
-            return <span style={styles.countdown}>{isUpcoming ? "Auction Started" : "Auction Ended"}</span>;
+    // Handle auction status update from upcoming to ongoing
+    const updateAuctionStatus = async (productId) => {
+        try {
+            await axios.post(
+                `${process.env.REACT_APP_ServerUrl}/updateAuctionStatus`,
+                { productId, newStatus: "ongoing" },
+                { withCredentials: true }
+            );
+            setProducts((prevProducts) =>
+                prevProducts.map((p) =>
+                    p.productId === productId ? { ...p, auctionStatus: "ongoing" } : p
+                )
+            );
+        } catch (err) {
+            console.error("Error updating auction status:", err.response?.data || err.message);
         }
-        return (
-            <span style={styles.countdown}>
-                {isUpcoming ? "Auction starts in: " : "Auction ends in: "}
-                {days}d {hours.toString().padStart(2, "0")}:
-                {minutes.toString().padStart(2, "0")}:
-                {seconds.toString().padStart(2, "0")}
-            </span>
-        );
     };
 
- 
+    const handleAuctionComplete = async (productId) => {
+        try {
+            await axios.post(
+                `${process.env.REACT_APP_ServerUrl}/completeAuction`,
+                { productId },
+                { withCredentials: true }
+            );
+            setProducts((prevProducts) =>
+                prevProducts.map((p) =>
+                    p.productId === productId ? { ...p, auctionStatus: "completed" } : p
+                )
+            );
+        } catch (err) {
+            console.error("Error completing auction:", err.response?.data || err.message);
+        }
+    };
+
+    // Countdown Renderer
+    const renderCountdown = (isUpcoming, product) => (
+        <Countdown
+            date={isUpcoming ? new Date(product.startDateTime) : new Date(product.endDateTime)}
+            onComplete={() => {
+                if (isUpcoming) {
+                    updateAuctionStatus(product.productId);
+                } else if (product.auctionStatus === "ongoing") {
+                    handleAuctionComplete(product.productId);
+                }
+            }}
+            renderer={({ days, hours, minutes, seconds, completed }) =>
+                completed ? (
+                    <span style={styles.countdown}>
+                        {isUpcoming ? "Auction Started" : "Auction Ended"}
+                    </span>
+                ) : (
+                    <span style={styles.countdown}>
+                        {isUpcoming ? "Auction starts in: " : "Auction ends in: "}
+                        {days}d {hours.toString().padStart(2, "0")}:
+                        {minutes.toString().padStart(2, "0")}:
+                        {seconds.toString().padStart(2, "0")}
+                    </span>
+                )
+            }
+        />
+    );
 
     const handlePlaceBid = (productId) => {
         const hash = btoa(productId); // Hash the product ID
         navigate(`/bidder/viewproduct/${hash}`);
     };
 
-    const renderSection = (title, items, isUpcoming) => (
+    // Section Renderer
+    const renderSection = (title, items, isUpcoming, hidePrice = false) => (
         <div style={styles.section}>
             <h2 style={styles.sectionTitle}>{title}</h2>
             <div style={styles.container}>
@@ -73,20 +168,36 @@ const AuctionItems = () => {
                             <h3 style={styles.title}>{product.productName}</h3>
                             <p style={styles.category}>Category: {product.category}</p>
                             <p style={styles.auctionStatus}>
-                                <Countdown
-                                    date={isUpcoming ? new Date(product.startDateTime) : new Date(product.endDateTime)}
-                                    renderer={(props) => renderCountdown(props, isUpcoming)}
-                                />
+                                {renderCountdown(isUpcoming, product)}
                             </p>
-                            <p style={styles.minimumPrice}>
-                                Minimum Price: <strong>₹{product.minimumPrice}</strong>
-                            </p>
+                            {/* Render live data for ongoing auctions */}
+                            {product.auctionStatus === "ongoing" && liveData[product.productId] && (
+                                <div style={styles.liveData}>
+                                    <p><strong>Highest Bid:</strong> ₹{liveData[product.productId].highestBid}</p>
+                                    {/* <p><strong>Highest Bidder:</strong> {liveData[product.productId].highestBidder}</p> */}
+                                    <p><strong>Number of Bids:</strong> {liveData[product.productId].numberOfBids}</p>
+                                    <p><strong>Percentage Increase:</strong> {liveData[product.productId].percentageIncrease}%</p>
+                                </div>
+                            )}
+                            {!hidePrice && (
+                                <p style={styles.startingPrice}>
+                                    Starting Price: <strong>₹{product.minimumPrice}</strong>
+                                </p>
+                            )}
                             <div style={styles.buttonGroup}>
-                                <button style={styles.button} className="mx-2"onClick={() => openModal(product)}>
+                                <button
+                                    style={styles.button}
+                                    className="mx-2"
+                                    onClick={() => openModal(product)}
+                                >
                                     View Details
                                 </button>
                                 {product.auctionStatus === "ongoing" && (
-                                    <button style={styles.button} className="mx-3" onClick={() => handlePlaceBid(product.productId)}>
+                                    <button
+                                        style={styles.button}
+                                        className="mx-3"
+                                        onClick={() => handlePlaceBid(product.productId)}
+                                    >
                                         Place Bid
                                     </button>
                                 )}
@@ -97,6 +208,7 @@ const AuctionItems = () => {
             </div>
         </div>
     );
+    
 
     if (loading) {
         return (
@@ -118,7 +230,7 @@ const AuctionItems = () => {
         <>
             {renderSection("Upcoming Auctions", groupedProducts.upcoming, true)}
             {renderSection("Ongoing Auctions", groupedProducts.ongoing, false)}
-            {renderSection("Completed Auctions", groupedProducts.completed)}
+            {renderSection("Completed Auctions", groupedProducts.completed, false, true)}
 
             {modalData && (
                 <div style={styles.modalOverlay} onClick={closeModal}>
@@ -134,6 +246,11 @@ const AuctionItems = () => {
         </>
     );
 };
+
+
+export default AuctionItems;
+
+
 
 const styles = {
     container: {
@@ -233,5 +350,3 @@ const styles = {
         cursor: "pointer",
     },
 };
-
-export default AuctionItems;

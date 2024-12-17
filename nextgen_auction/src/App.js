@@ -12,6 +12,18 @@ import AddProduct from './components/seller/AddProduct';
 import SellerDashBoard from './components/seller/SellerDashboard';
 import SignUp from './components/signup';
 import ViewProduct from './components/ViewProduct';
+import MyProducts from './components/seller/MyProducts';
+import TrackProduct from './components/TrackProduct';
+import BidderDashBoard from './components/bidder/BidderDashboard';
+import MyBids from './components/bidder/MyBids';
+import Payment from './components/PaymetGateway';
+import PaymentComponent from './components/PaymetGateway';
+import AdminDashBoard from './components/admin/AdminDashboard';
+import SaleCertificate from './components/admin/SaleCertificate';
+import ViewCertificate from './components/admin/ViewCertificate';
+import GenerateCertificate from './components/admin/GenerateCertificate';
+import FooterComponent from './components/Footer';
+import WinnerList from './components/seller/WinnerList';
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -55,7 +67,17 @@ function App() {
             case 'admin':
                 return (
                     <Routes>
-                        <Route path="/" element={<Home />} />
+
+                        <Route path="/admin" element={<AdminDashBoard />}>
+                            <Route index element={<Hero />} />
+                            <Route path="SaleCertificate" element={<SaleCertificate />} />
+                            <Route path="ViewCertificate" element={<ViewCertificate />} />
+
+                            {/* <Route path="WinnersList" element={<WinnersList />} /> */}
+                        </Route>
+                        <Route path="/admin/generateCertificate" element={<GenerateCertificate />} />
+
+
                         {/* Add more admin-specific routes here */}
                     </Routes>
                 );
@@ -65,16 +87,26 @@ function App() {
                         <Route path="/seller" element={<SellerDashBoard />}>
                             <Route index element={<Hero />} />
                             <Route path="AddProduct" element={<AddProduct />} />
-                            {/* <Route path="MyProducts" element={<MyProducts />} />
-                            <Route path="WinnersList" element={<WinnersList />} /> */}
+                            <Route path="MyProducts" element={<MyProducts />} />
+                            <Route path="WinnersList" element={<WinnerList />} />
+
+                            {/* <Route path="WinnersList" element={<WinnersList />} /> */}
                         </Route>
+                        <Route path="/trackproduct/:hash" element={<TrackProduct />} />
                     </Routes>
                 );
 
             case 'bidder':
                 return (
                     <Routes>
-                        <Route path="/bidder" element={<Home />} />
+
+                        <Route path="/bidder" element={<BidderDashBoard />}>
+                            <Route index element={<Home />} />
+                            <Route path="myBids" element={<MyBids />} />
+
+
+                        </Route>
+                        <Route path="/bidder/payment/:hash" element={<PaymentComponent />} />
                         <Route path="/bidder/viewproduct/:hash" element={<ViewProduct />} />
 
                         {/* Add more bidder-specific routes here */}
@@ -98,6 +130,7 @@ function App() {
             <div>
                 <Navbar />
                 <main>{renderRoutes()}</main>
+                {/* <FooterComponent/> */}
             </div>
         </Router>
     );

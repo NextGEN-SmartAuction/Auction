@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 
 
 const SellerOnboarding = () => {
@@ -13,7 +13,7 @@ const SellerOnboarding = () => {
     };
 
     const [form, setForm] = useState({
-        userName:"",
+        userName: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -64,14 +64,14 @@ const SellerOnboarding = () => {
         setForm((prev) => ({ ...prev, [name]: value }));
         console.log("Updated form:", form);
     };
-    
+
 
 
     const handleFileChange = (e) => {
-        const {  files } = e.target;
+        const { files } = e.target;
         setLogoFile(files[0]);  // Store the actual file in the logoFile state
     };
-   
+
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, address: { ...form.address, [name]: value } });
@@ -82,7 +82,7 @@ const SellerOnboarding = () => {
             case 1:
                 return form.email && form.password && form.confirmPassword && form.password === form.confirmPassword
             case 2:
-                return form.sellerName && form.displayName && form.orgName && form.website  && form.caption;
+                return form.sellerName && form.displayName && form.orgName && form.website && form.caption;
             case 3:
                 return (
                     form.address.country &&
@@ -123,7 +123,7 @@ const SellerOnboarding = () => {
         formData.append("file", file); // The file input from the user
         formData.append("username", userName); // Username of the user
         console.log("Form Data:", formData);
-    
+
         try {
             const response = await axios.post(
                 `${process.env.REACT_APP_FlaskUrl}/upload`,
@@ -133,7 +133,7 @@ const SellerOnboarding = () => {
                     withCredentials: true, // Send cookies if required for authentication
                 }
             );
-    
+
             console.log("Upload successful:", response.data);
             return response.data; // Returns uploaded file details
         } catch (error) {
@@ -141,30 +141,32 @@ const SellerOnboarding = () => {
             throw new Error("Failed to upload logo!");
         }
     };
-    
-    
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         try {
             const userName = form.userId; // Ensure userId exists
             if (!userName) {
                 toast.error("userid is required!");
                 return;
             }
-    
+
             let logoName = ""; // Initialize logoName dynamically
             if (logoFile) {
-                logoName = `${userName}`;
+                // Get the file extension
+                const fileExtension = logoFile.name.split('.').pop();
+                logoName = `${userName}.${fileExtension}`; // Append extension to userName
                 console.log("Generated Logo Name:", logoName);
-    
-                await uploadLogo(logoFile, logoName); // Upload logo with generated name
+
+                await uploadLogo(logoFile, userName); // Upload logo with generated name
             }
-    
+
             const finalForm = { ...form, logoName }; // Add logoName dynamically to form
             console.log("Final Form Data:", finalForm);
-    
+
             const signupResponse = await signup(finalForm); // Submit form data
             console.log("Signup Successful:", signupResponse);
             toast.success("Form submitted successfully!");
@@ -173,13 +175,13 @@ const SellerOnboarding = () => {
             toast.error("Form submission failed!");
         }
     };
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     const signup = async (formData) => {
         try {
             // Replace the URL with your actual endpoint for user registration
@@ -315,7 +317,7 @@ const SellerOnboarding = () => {
                                 <input
                                     type="text"
                                     className="form-control"
-                                    name="userName" 
+                                    name="userName"
                                     value={form.userName}
                                     onChange={handleInputChange}
                                     required

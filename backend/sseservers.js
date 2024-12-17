@@ -17,7 +17,8 @@ mongoose.connect(process.env.REACT_APP_MongoLink)
     .then(() => console.log('Connected to MongoDB for SSE server'))
     .catch((err) => console.error('Error connecting to MongoDB:', err));
 
-// SSE Endpoint for auction updates
+
+
 app.get('/auction/:auctionId/updates', async (req, res) => {
     const { auctionId } = req.params;
     console.log("hello im sse server", auctionId);
@@ -41,6 +42,7 @@ app.get('/auction/:auctionId/updates', async (req, res) => {
         res.write(`data: ${JSON.stringify({
             highestBid: auction.highest_bid || 'No bids yet',
             highestBidder: highestBidderUsername,
+            highestBidderId: auction.highest_bidder_id || 'N/A', // Include bidder ID
             numberOfBids: auction.total_bids || 0,
             percentageIncrease: auction.highest_bid
                 ? (((auction.highest_bid - auction.starting_price) / auction.starting_price) * 100).toFixed(2)
@@ -57,6 +59,7 @@ app.get('/auction/:auctionId/updates', async (req, res) => {
             res.write(`data: ${JSON.stringify({
                 highestBid: updatedAuction.highest_bid,
                 highestBidder: highestBidderUsername,
+                highestBidderId: updatedAuction.highest_bidder_id, // Include bidder ID
                 numberOfBids: updatedAuction.total_bids,
                 percentageIncrease: (((updatedAuction.highest_bid - updatedAuction.starting_price) / updatedAuction.starting_price) * 100).toFixed(2),
             })}\n\n`);
@@ -70,6 +73,9 @@ app.get('/auction/:auctionId/updates', async (req, res) => {
     });
 });
 
+
+
+
 // Start server on port 5003
 const PORT = process.env.REACT_APP_SsePort;
-app.listen(PORT, () => console.log(`SSE server running on port ${PORT}`));
+app.listen(PORT ,() => console.log(`SSE server running on port ${PORT}`));

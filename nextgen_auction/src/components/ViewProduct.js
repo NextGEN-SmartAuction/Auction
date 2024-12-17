@@ -21,6 +21,9 @@ const ViewProduct = () => {
     const [bidAmount, setBidAmount] = useState("");
     const [seller, setSeller] = useState(null); // State for storing seller details
     const [activeSellerTab, setActiveSellerTab] = useState("profile");
+    const [username, setUsername] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [auctionHistory, setAuctionHistory] = useState(null);
 
     const handleSellerTabChange = (tab) => setActiveSellerTab(tab);
     const [activeTab, setActiveTab] = useState("placeBid");
@@ -37,7 +40,8 @@ const ViewProduct = () => {
 
     const [socketInfo, setSocketInfo] = useState({
         highestBid: 0,
-        highestBidder: "Loading...", // Added highestBidder to the state
+        highestBidder: "Loading...", // Updated highestBidder
+        highestBidderId: "Loading...", // Added highestBidderId to the state
         numberOfBids: "Loading...",
         percentageIncrease: 0,
     });
@@ -55,10 +59,11 @@ const ViewProduct = () => {
 
             // Update state with new auction information
             setSocketInfo({
-                highestBid: data.highestBid || 0,
-                highestBidder: data.highestBidder || "No bids !!!",
-                numberOfBids: data.numberOfBids || 0,
-                percentageIncrease: data.percentageIncrease || 0,
+                highestBid: data.highestBid,
+                highestBidder: data.highestBidder,
+                highestBidderId: data.highestBidderId, // Update highestBidderId
+                numberOfBids: data.numberOfBids,
+                percentageIncrease: data.percentageIncrease,
             });
         };
 
@@ -77,10 +82,28 @@ const ViewProduct = () => {
 
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchData = async () => {
             try {
+                // Check for JWT token
+                const jwtToken = Cookies.get('jwt');
+                if (!jwtToken) {
+                    throw new Error("JWT token not found.");
+                }
+
+                // Fetch user authentication details
+                const authResponse = await axios.get(
+                    `${process.env.REACT_APP_ServerUrl}/profile`,
+                    { withCredentials: true }
+                );
+                const { username, userId } = authResponse.data;
+
+                setUsername(username);
+                setUserId(userId);
+
+                // Decode productId from hash
                 const productId = atob(hash);
 
+                // Fetch product details
                 const productResponse = await axios.get(
                     `${process.env.REACT_APP_ServerUrl}/products`,
                     { withCredentials: true }
@@ -94,32 +117,67 @@ const ViewProduct = () => {
                 }
                 setProduct(foundProduct);
 
+                // Fetch product images
                 const imagesResponse = await axios.get(
                     `${process.env.REACT_APP_FlaskUrl}/get-product-images/${productId}`
                 );
                 setImages(imagesResponse.data.images);
                 setSelectedImage(imagesResponse.data.images[0]);
 
+                // Fetch participated bids and filter by productId
+                try {
+                    const participatedResponse = await axios.post(
+                        `${process.env.REACT_APP_ServerUrl}/fetchBids`,
+                        { userId },
+                        { withCredentials: true }
+                    );
+
+                    // Check if the response contains any bids
+                    if (participatedResponse.data && participatedResponse.data.length > 0) {
+                        // Find the bid for the specific product
+                        const productBids = participatedResponse.data.find(
+                            (bid) => bid.productId === foundProduct.productId
+                        );
+
+                        // If bids exist for the product, set them in auctionHistory
+                        if (productBids) {
+                            setAuctionHistory(productBids.bidHistory);
+                        } else {
+                            // No bids for the found product
+                            setAuctionHistory([]);
+                        }
+                    } else {
+                        // No bids data or empty array returned
+                        setAuctionHistory([]);
+                    }
+                } catch (error) {
+                    console.error("Error fetching bids:", error);
+                    // Handle the error, maybe display a message to the user
+                    setAuctionHistory([]);
+                }
 
 
-
-                // Fetch seller details based on sellerId from the product
+                // Fetch seller details
                 const sellerResponse = await axios.get(
                     `${process.env.REACT_APP_ServerUrl}/sellers/${foundProduct.sellerId}`,
                     { withCredentials: true }
                 );
-                setSeller(sellerResponse.data); // Store the seller data in state
+                setSeller(sellerResponse.data);
 
                 setLoading(false);
-            } catch (err) {
-                console.error("Error fetching product details or images:", err.message);
-                setError("Failed to fetch product details or images! Please try again.");
+            } catch (error) {
+                console.error("Error fetching data:", error.message);
+                setError("Failed to fetch data! Please try again.");
                 setLoading(false);
             }
         };
 
-        fetchProduct();
+        fetchData();
     }, [hash]);
+
+
+
+
 
     const handleTabChange = (tab) => setActiveTab(tab);
 
@@ -130,31 +188,6 @@ const ViewProduct = () => {
 
         setBidAmount(newBid);
     };
-
-    const [username, setUsername] = useState(null);
-    const [userId, setUserId] = useState(null);
-
-    useEffect(() => {
-        const jwtToken = Cookies.get('jwt');
-        if (jwtToken) {
-            const checkAuthenticationStatus = async () => {
-                try {
-                    const response = await axios.get(
-                        `${process.env.REACT_APP_ServerUrl}/profile`,
-                        { withCredentials: true }
-                    );
-                    const { username, userId } = response.data;
-                    setUsername(username);
-                    setUserId(userId);
-                } catch (error) {
-                    console.error('Authentication check failed:', error);
-                }
-            };
-            checkAuthenticationStatus();
-        }
-    }, []);
-
-
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -193,6 +226,7 @@ const ViewProduct = () => {
                     auctionId: product.productId,
                     bidderId: userId,
                     bidAmount: bidAmount,
+                    bidderName: username,
                 },
                 { withCredentials: true }
             );
@@ -224,8 +258,6 @@ const ViewProduct = () => {
             }
         }
     };
-
-
 
     if (loading) {
         return (
@@ -551,7 +583,33 @@ const ViewProduct = () => {
                                     </div>
                                 </div>
                             )}
-                            {activeTab === "auctionHistory" && <p>Auction history will be shown here.</p>}
+
+                            {activeTab === "auctionHistory" && (
+                                <div>
+                                    <h4>Auction History</h4>
+                                    {auctionHistory.length > 0 ? (
+                                        <table className="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Timestamp</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {auctionHistory.map((entry, index) => (
+                                                    <tr key={index}>
+                                                        <td>{new Date(entry.timestamp).toLocaleString()}</td>
+                                                        <td>{entry.amount}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    ) : (
+                                        <p>No bid history available for this product.</p>
+                                    )}
+                                </div>
+                            )}
+
                             {activeTab === "winner" && <p>Winner: To be decided.</p>}
                             {activeTab === "delivery" && <p>Delivery in 10 working days.</p>}
                         </div>

@@ -1,0 +1,50 @@
+
+# single_input = [
+#     0.944444,
+#     0.676190,
+#     1.0,
+#     0.985820,
+#     0.355224,
+#     1.00,
+#     0.720704,
+#     0.5000,
+#     0.22222  # Convert seconds to hours
+# ]
+
+# single_input = [
+#     0.944444,
+#     0.676190,
+#     auction['successive_outbidding'],
+#     0.985820,
+#     0.355224,
+#     1.00,
+#     0.720704,
+#     auction['winning_ratio'],
+#     auction['auction_duration'] // 3600  # Convert seconds to hours
+
+# ]
+
+
+# single_input = [
+#     auction['bidder_tendency'],
+#     auction['bidding_ratio'],
+#     1.0,
+#     auction['last_bidding'],
+#     auction_bid,
+#     auction_start_price,
+#     auction['early_bidding'],
+#     0.50,
+#     0.2222 # Convert seconds to hours
+# ]
+
+# single_input = [
+#     auction['bidder_tendency'],
+#     auction['bidding_ratio'],
+#     1.0,
+#     auction['last_bidding'],
+#     auction_bid,
+#     auction_start_price,
+#     auction['early_bidding'],
+#     0.50,
+#     auction['auction_duration'] // 3600 # Convert seconds to hours
+# ]

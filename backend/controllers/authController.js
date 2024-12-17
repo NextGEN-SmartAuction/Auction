@@ -4,6 +4,7 @@ const UserModel = require('../models/userModel');
 const SellerDetailsModel = require('../models/SellerDetailsModel');
 const BidderDetailsModel = require('../models/BidderDetailsModel');
 const ProductDetailsModal = require('../models/ProductDetailsModal');
+const Transaction= require('../models/TransactionsModal');
 const ProductsModal = require('../models/ProductsModal');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
@@ -16,7 +17,7 @@ const FormData = require('form-data');
 
 const axios = require('axios');
 
-const maxAge =  3 * 24 * 60 * 60 * 1000;
+const maxAge = 3 * 24 * 60 * 60 * 1000;
 
 var otp1 = 1;
 
@@ -29,7 +30,7 @@ dotenv.config({ path: './.env' });
 
 
 const generateToken = (user) => {
-    return jwt.sign({ username: user.username ,role:user.role,displayName: user.displayName ,userId :user.userId},  process.env.REACT_APP_SecretKey);
+    return jwt.sign({ username: user.username, role: user.role, displayName: user.displayName, userId: user.userId }, process.env.REACT_APP_SecretKey);
 };
 
 const getotp = async (req, res) => {
@@ -90,11 +91,11 @@ const signup = async (req, res) => {
                 website: req.body.website,
                 orgName: req.body.orgName,
                 caption: req.body.caption,
-                logoName : req.body.logoName,
+                logoName: req.body.logoName,
                 email: req.body.email,
                 primaryMobile: req.body.primaryMobile,
                 secondaryMobile: req.body.secondaryMobile,
-                address: req.body.address,   
+                address: req.body.address,
             });
 
             // Save the seller details
@@ -106,7 +107,7 @@ const signup = async (req, res) => {
         if (req.body.role === 'bidder') {
             const newBidder = new BidderDetailsModel({
                 userName: req.body.userName,
-                bidderId:req.body.userId,
+                bidderId: req.body.userId,
                 name: req.body.name,
                 displayName: req.body.displayName,
                 email: req.body.email,
@@ -121,7 +122,7 @@ const signup = async (req, res) => {
         // Now save the user information (this applies for both "seller" and other roles)
         const newUser = new UserModel({
             username: req.body.userName,
-            userId:req.body.userId,
+            userId: req.body.userId,
             displayName: req.body.displayName,
             email: req.body.email,
             password: req.body.password,
@@ -133,12 +134,65 @@ const signup = async (req, res) => {
         console.log('User saved:', result);
 
 
-        
+
         res.sendStatus(200);
 
     } catch (error) {
         console.error(error);
         res.sendStatus(500);
+    }
+};
+
+
+const getTransactionDetails = async (req, res) => {
+    try {
+        // Fetch all product details from the database
+        const products = await Transaction.find();
+
+        // Send the data as a JSON response
+        res.status(200).json({
+            success: true,
+            message: "Product details fetched successfully",
+            data: products,
+        });
+    } catch (error) {
+        console.error("Error fetching product details:", error);
+
+        // Send an error response
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch product details",
+            error: error.message,
+        });
+    }
+};
+
+
+const updateIpfsHash = async (req, res) => {
+    const { productId, ipfsHash } = req.body;
+
+    if (!productId || !ipfsHash) {
+        return res.status(400).json({ message: 'productId and ipfsHash are required' });
+    }
+
+    try {
+        // Find the transaction by productId
+        const transaction = await Transaction.findOne({ productId });
+
+        if (!transaction) {
+            return res.status(404).json({ message: `Transaction with productId ${productId} not found` });
+        }
+
+        // Update the ipfsHash
+        transaction.ipfsHash = ipfsHash;
+
+        // Save the updated transaction
+        await transaction.save();
+
+        return res.status(200).json({ message: 'IPFS Hash updated successfully', transaction });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error updating IPFS hash', error: error.message });
     }
 };
 
@@ -167,20 +221,79 @@ const getProductDetails = async (req, res) => {
 };
 
 
+
+// Backend: Updated getProductDetailsById
+const getProductDetailsById = async (req, res) => {
+    try {
+        const { productId } = req.body; 
+        console.log("im called");// Extract productId from request body
+        console.log(productId);// Extract productId from request body
+
+        // Fetch product details from ProductDetailsModal
+        const product = await ProductDetailsModal.findOne({ productId });
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found",
+            });
+        }
+
+        // Fetch auction details to get highest bid and bidder information
+        const auction = await Auction.findOne({ auction_id: productId });
+        if (!auction) {
+            return res.status(404).json({
+                success: false,
+                message: "Auction details not found",
+            });
+        }
+
+        // Fetch seller and bidder details from UserModel
+        const seller = await UserModel.findOne({ userId: auction.seller_id });
+        const bidder = await UserModel.findOne({ userId: auction.highest_bidder_id });
+
+        const response = {
+            productName: product.productName,
+            minimumPrice: product.minimumPrice,
+            logo:product.logoImageName,
+            seller: {
+                userId: seller?.userId || null,
+                username: seller?.username || null,
+            },
+            bidder: {
+                userId: bidder?.userId || null,
+                username: bidder?.username || null,
+            },
+            highestBid: auction.highest_bid || 0,
+        };
+
+        res.status(200).json({
+            success: true,
+            message: "Product details fetched successfully",
+            data: response,
+        });
+    } catch (error) {
+        console.error("Error fetching product details:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch product details",
+            error: error.message,
+        });
+    }
+};
+
+
 const addProduct = async (req, res) => {
     try {
-        const { 
-            role, 
-            username, 
-            productId, 
-            auctionStatus, 
-            productStatus, 
-            userId, 
-            startDateTime, 
-            endDateTime, 
-            startingPrice, 
-            priceInterval, 
-            minimumPrice 
+        const {
+            username,
+            productId,
+            auctionStatus,
+            productStatus,
+            userId,
+            startDateTime,
+            endDateTime,
+            priceInterval,
+            minimumPrice
         } = req.body;
 
         // Ensure user exists and has the correct role (seller)
@@ -214,9 +327,8 @@ const addProduct = async (req, res) => {
             productName: req.body.productName,
             description: req.body.description,
             productStatus: productStatus || 'unsold',
-            logoImageName:req.body.logoImageName,
+            logoImageName: req.body.logoImageName,
             auctionStatus: auctionStatus || 'upcoming',
-            winner: 'tbd', // Default winner to 'tbd'
         });
 
         const productDetailsResult = await newProductDetails.save();
@@ -274,6 +386,65 @@ const addProduct = async (req, res) => {
 };
 
 
+const completePayment = async (req, res) => {
+    try {
+        const { 
+            sellerId, sellerName, bidderId, bidderName, 
+            amount, transactionId, productId ,productName,logoImageName
+        } = req.body;
+
+        // Get current date and time
+        const currentDate = new Date();
+
+        // Format date as dd-mm-yyyy
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = currentDate.getFullYear(); // Full year
+        const formattedDate = `${day}-${month}-${year}`;  // Updated to dd-mm-yyyy
+
+        // Format time as hh:mm:ss
+        const hours = String(currentDate.getHours()).padStart(2, '0');
+        const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+        const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+        const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+        // Create a new transaction
+        const newTransaction = new Transaction({
+            productId,
+            productName,
+            logoImageName,
+            sellerId,
+            sellerName,
+            bidderId,
+            bidderName,
+            amount,
+            transactionId,
+            date: formattedDate,  // Store formatted date
+            time: formattedTime   // Store formatted time
+        });
+        await newTransaction.save();
+
+        // Update payment status in ProductDetailsModal
+        await ProductDetailsModal.updateOne(
+            { productId },
+            { $set: { paymentStatus: 'completed' } }
+        );
+
+        // Update payment status in ProductsModal
+        await ProductsModal.updateOne(
+            { 'products.productId': productId },
+            { $set: { 'products.$.paymentStatus': 'completed' } }
+        );
+
+        res.status(200).json({ message: 'Payment completed successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to complete payment.' });
+    }
+};
+
+
+
 
 const login = async (req, res) => {
     console.log('Received login request:', req.query);
@@ -318,9 +489,9 @@ const getProfile = (req, res) => {
     console.log(token)
     if (token) {
         try {
-            const decoded = jwt.verify(token,  process.env.REACT_APP_SecretKey);
-            const { username,role,displayName,userId } = decoded;
-            res.json({ username,role ,displayName,userId});
+            const decoded = jwt.verify(token, process.env.REACT_APP_SecretKey);
+            const { username, role, displayName, userId } = decoded;
+            res.json({ username, role, displayName, userId });
         } catch (err) {
             res.sendStatus(401); // Invalid token
         }
@@ -349,10 +520,45 @@ const getSellerDetails = async (req, res) => {
     }
 };
 
+const trackProduct = async (req, res) => {
+    try {
+        const { productId } = req.body; // Extract productId from request body
 
+        // Query the database to find bidders with bids for the specified productId
+        const biddersData = await BiddersAuction.find({ [`bid_history.${productId}`]: { $exists: true } });
+
+        // Iterate through the bidders and map out their bid history for the given productId
+        const matchedBidders = biddersData.map(bidder => {
+            // Get the bids for the specific productId from the Map
+            const matchedBids = bidder.bid_history.get(productId) || [];
+
+            // Include the productId in the response
+            return {
+                bidder_id: bidder.bidder_id,
+                bidder_name: bidder.bidder_name,
+                product_id: productId,
+                bid_details: matchedBids.map(bid => ({
+                    amount: bid.amount,
+                    timestamp: bid.timestamp,
+                })),
+            };
+        });
+
+        // If we have matching bidders, return them
+        if (matchedBidders.length > 0) {
+            return res.status(200).json(matchedBidders);
+        }
+
+        // If no bidders were found for the specified productId
+        return res.status(404).json({ message: 'No bidders found for this product.' });
+    } catch (error) {
+        console.error('Error in tracking product:', error.message);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 const placeBid = async (req, res) => {
-    const { auctionId, bidderId, bidAmount } = req.body;
+    const { auctionId, bidderId, bidAmount, bidderName } = req.body;
 
     try {
         // Fetch the auction details
@@ -373,7 +579,7 @@ const placeBid = async (req, res) => {
 
             if (highestBid < 500) {
                 // Bids below ₹1,000
-                const percentages = [ 200, 250 ,300]; // Subcategories
+                const percentages = [200, 250, 300]; // Subcategories
                 return percentages[Math.floor(Math.random() * percentages.length)];
             }
             if (highestBid < 1000) {
@@ -408,7 +614,7 @@ const placeBid = async (req, res) => {
 
         // Get the dynamic percentage
 
-        
+
         const MAX_INCREMENT_PERCENTAGE = getDynamicIncrementPercentage(auction.highest_bid);
         console.log(MAX_INCREMENT_PERCENTAGE);
         console.log(auction.highest_bid);
@@ -439,9 +645,8 @@ const placeBid = async (req, res) => {
         if (!bidder) {
             bidder = new BiddersAuction({
                 bidder_id: bidderId,
-                total_starting_price: 0,
+                bidder_name: bidderName,
                 total_auctions_participated: 0,
-                starting_price_average: 0,
                 bid_history: new Map(),
             });
         }
@@ -449,9 +654,6 @@ const placeBid = async (req, res) => {
         // If the bidder is new to this auction, update their starting price stats
         if (!bidder.bid_history.has(auctionId)) {
             bidder.total_auctions_participated += 1;
-            bidder.total_starting_price += auction.starting_price;
-            bidder.starting_price_average =
-                bidder.total_starting_price / bidder.total_auctions_participated;
             bidder.bid_history.set(auctionId, []);
         }
 
@@ -510,19 +712,124 @@ const placeBid = async (req, res) => {
 };
 
 
-const getFlaskInfo = async (req, res) => {
+const getTotalBids = async () => {
     try {
+        // Step 1: Fetch all auctions
+        const auctions = await Auction.find({});
+        // console.log('Auctions fetched:', auctions.length);
+
+        // Step 2: Fetch all product details
+        const productDetails = await ProductDetailsModal.find({});
+        // console.log('Product details fetched:', productDetails.length);
+
+        // Step 3: Create a map for product details (productId -> shillBiddingStatus)
+        const productMap = {};
+        productDetails.forEach((product) => {
+            productMap[product.productId] = product.shillBiddingStatus;
+        });
+
+        // console.log('Product map created:', Object.keys(productMap).length);
+
+        // Step 4: Create an empty array to store the total_bids for valid auctions
+        const totalBidsArray = [];
+
+        // Step 5: Iterate over each auction and check corresponding product details
+        for (const auction of auctions) {
+            const productShillBiddingStatus = productMap[auction.auction_id];  // Match productId with auctionId
+
+            // Check if the shillBiddingStatus is not 'happened'
+            if (productShillBiddingStatus !== 'happened') {
+                // If the status is not 'happened', add the total_bids to the array
+                totalBidsArray.push(auction.total_bids);
+                // console.log(`Auction with ID ${auction.auction_id} added to totalBidsArray (Total Bids: ${auction.total_bids})`);
+            }
+        }
+
+        // Step 6: Return the array of total_bids for valid auctions
+        // console.log('Total Bids Array:', totalBidsArray.length);
+        return totalBidsArray;  // Return the array of total_bids
+    } catch (error) {
+        console.error("Error fetching auction data:", error.message);
+        throw new Error("Failed to fetch auction data");
+    }
+};
+
+
+const getStartingBids = async () => {
+    try {
+        // Step 1: Fetch all auctions
+        const auctions = await Auction.find({});
+        // console.log('Auctions fetched:', auctions.length);
+
+        // Step 2: Fetch all product details
+        const productDetails = await ProductDetailsModal.find({});
+        // console.log('Product details fetched:', productDetails.length);
+
+        // Step 3: Create a map for product details (productId -> shillBiddingStatus)
+        const productMap = {};
+        productDetails.forEach((product) => {
+            productMap[product.productId] = product.shillBiddingStatus;
+        });
+
+        // console.log('Product map created:', Object.keys(productMap).length);
+
+        // Step 4: Create an array to store the starting prices for valid auctions
+        const startingPricesArray = [];
+
+        // Step 5: Iterate over each auction and check corresponding product details
+        for (const auction of auctions) {
+            const productShillBiddingStatus = productMap[auction.auction_id]; // Match productId with auctionId
+
+            // Check if the shillBiddingStatus is not 'happened'
+            if (productShillBiddingStatus !== 'happened') {
+                startingPricesArray.push(auction.starting_price);
+                // console.log(`Auction with ID ${auction.auction_id} added to startingPricesArray (Starting Price: ${auction.starting_price})`);
+            }
+        }
+
+        // Step 6: Return the array of starting prices for valid auctions
+        // console.log('Starting Prices Array:', startingPricesArray.length);
+        return startingPricesArray; // Return the array of starting prices
+    } catch (error) {
+        console.error("Error fetching starting prices:", error.message);
+        throw new Error("Failed to fetch starting prices");
+    }
+};
+
+
+const getFlaskInfoById = async (auction_id) => {
+    try {
+        // Step 1: Fetch all auctions and bidders
         const auctions = await Auction.find({});
         const bidders = await BiddersAuction.find({});
 
+        // Step 2: Call `getTotalBids` to get the total_bids for valid auctions
+        const totalBidsArray = await getTotalBids();
+
+        // Step 3: Call `getStartingBids` to get the starting prices for valid auctions
+        const startingPricesArray = await getStartingBids();
+        const minStartingPrice = Math.min(...startingPricesArray);
+        const maxStartingPrice = Math.max(...startingPricesArray);
+
+        // console.log('Min Starting Price:', minStartingPrice);
+        // console.log('Max Starting Price:', maxStartingPrice);
+
+        // Step 4: Calculate min_bids and max_bids
+        const minBids = Math.min(...totalBidsArray);
+        const maxBids = Math.max(...totalBidsArray);
+
+        // console.log('Min Bids:', minBids);
+        // console.log('Max Bids:', maxBids);
+
+        // Step 5: Map bidders data to make it easily accessible
         const bidderMap = {};
         bidders.forEach((bidder) => {
             bidderMap[bidder.bidder_id] = {
                 winning_ratio: bidder.winning_ratio,
-                starting_price_average: bidder.starting_price_average,
             };
         });
 
+        // Step 6: Prepare auction data
         const auctionData = {};
 
         auctions.forEach((auction) => {
@@ -532,9 +839,9 @@ const getFlaskInfo = async (req, res) => {
             auction.bids.forEach((bid) => {
                 const bidderData = bidderMap[bid.bidder_id] || {
                     winning_ratio: 0,
-                    starting_price_average: 0,
                 };
 
+                // Calculate additional stats
                 const totalAuctionCount = auctions.filter((a) =>
                     a.bids.some((b) => b.bidder_id === bid.bidder_id)
                 ).length;
@@ -547,6 +854,7 @@ const getFlaskInfo = async (req, res) => {
 
                 const bidderTendency = sameSellerAuctionCount / (totalAuctionCount || 1);
 
+                // Step 7: Push the necessary data including min_bids and max_bids
                 auctionData[auctionId].push({
                     bidder_tendency: bidderTendency,
                     bidding_ratio: bid.num_bids / (auction.total_bids || 1),
@@ -554,22 +862,93 @@ const getFlaskInfo = async (req, res) => {
                     last_bidding: 1 - (bid.last_bid_time / auction.auction_duration),
                     early_bidding: bid.first_bid_time / auction.auction_duration,
                     auction_bids: auction.total_bids,
-                    starting_price_average: bidderData.starting_price_average,
+                    current_starting_price: auction.starting_price,
+                    min_starting_price: minStartingPrice,
+                    max_starting_price: maxStartingPrice,
                     winning_ratio: bidderData.winning_ratio,
                     auction_duration: auction.auction_duration,
+                    min_bids: minBids,
+                    max_bids: maxBids,
                 });
             });
         });
 
+        // console.log("Auction Data:", auctionData[auction_id]);
+
+        // Step 8: Return the auction data for the specific auction_id
+        return auctionData[auction_id] || {}; // Returning the specific auction data
+    } catch (error) {
+        console.error("Error fetching Flask info by ID:", error.message);
+        throw new Error("Failed to fetch Flask info by ID");
+    }
+};
+
+
+const getBidderAnalytics = async (req, res) => {
+    try {
+        // Step 1: Extract auction_id from the request body
+        const { auction_id } = req.query;
+        console.log(auction_id);
+        if (!auction_id) {
+            return res.status(400).json({
+                success: false,
+                message: "auction_id is required",
+            });
+        }
+
+        // Step 2: Fetch the specific auction and its bids
+        const auction = await Auction.findOne({ auction_id });
+        if (!auction) {
+            return res.status(404).json({
+                success: false,
+                message: "Auction not found",
+            });
+        }
+
+        // Step 3: Prepare bidder analytics
+        const bidderAnalytics = {};
+
+        auction.bids.forEach((bid) => {
+            const bidderId = bid.bidder_id;
+
+            // Initialize entry for bidder if not exists
+            if (!bidderAnalytics[bidderId]) {
+                bidderAnalytics[bidderId] = {
+                    bidder_tendency: 0,
+                    highest_bid_to_seller: auction.highest_bid,
+                    first_bid_time: bid.first_bid_time,
+                    last_bid_time: bid.last_bid_time,
+                    num_bids: bid.num_bids,
+                    auction_duration: auction.auction_duration,
+                };
+            }
+
+            // Update analytics for the bidder
+            const totalAuctionCount = 1; // Only current auction is relevant
+            const sameSellerAuctionCount = auction.seller_id === auction.seller_id ? 1 : 0;
+
+            bidderAnalytics[bidderId].bidder_tendency =
+                sameSellerAuctionCount / totalAuctionCount;
+            bidderAnalytics[bidderId].first_bid_time = Math.min(
+                bidderAnalytics[bidderId].first_bid_time,
+                bid.first_bid_time
+            );
+            bidderAnalytics[bidderId].last_bid_time = Math.max(
+                bidderAnalytics[bidderId].last_bid_time,
+                bid.last_bid_time
+            );
+        });
+
+        // Step 4: Return the processed data
         return res.status(200).json({
             success: true,
-            data: auctionData,
+            data: bidderAnalytics,
         });
     } catch (error) {
-        console.error("Error fetching data for model:", error.message);
+        console.error("Error fetching analytics:", error.message);
         return res.status(500).json({
             success: false,
-            message: "Failed to fetch auction and bidder data",
+            message: "Failed to fetch bidder analytics",
             error: error.message,
         });
     }
@@ -578,15 +957,286 @@ const getFlaskInfo = async (req, res) => {
 
 
 
+
+const updateAuctionStatus = async (req, res) => {
+    const { productId, newStatus } = req.body; // Receive productId and newStatus from the frontend
+
+    if (!productId || !newStatus) {
+        return res.status(400).json({
+            success: false,
+            message: "Product ID and new status are required."
+        });
+    }
+
+    try {
+        // Update the product in the ProductsModal
+        const productsResult = await ProductsModal.findOneAndUpdate(
+            { "products.productId": productId }, // Match the product in the products array
+            { $set: { "products.$.auctionStatus": newStatus } }, // Update the auctionStatus of the matched product
+            { new: true } // Return the updated document
+        );
+
+        if (!productsResult) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in ProductsModal."
+            });
+        }
+
+        // Update the product in the ProductDetailsModal
+        const productDetailsResult = await ProductDetailsModal.findOneAndUpdate(
+            { productId }, // Match by productId
+            { $set: { auctionStatus: newStatus } }, // Update the auctionStatus
+            { new: true } // Return the updated document
+        );
+
+        if (!productDetailsResult) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in ProductDetailsModal."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Auction status updated successfully in both models.",
+            updatedProductsModal: productsResult,
+            updatedProductDetailsModal: productDetailsResult,
+        });
+    } catch (error) {
+        console.error("Error updating auction status:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error. Could not update auction status.",
+        });
+    }
+};
+
+
+const updateProductStatus = async (req, res) => {
+    const { productId, newStatus } = req.body; // Receive productId and newStatus from the frontend
+
+    if (!productId || !newStatus) {
+        return res.status(400).json({
+            success: false,
+            message: "Product ID and new status are required."
+        });
+    }
+
+    try {
+        // Update the product in the ProductsModal
+        const productsResult = await ProductsModal.findOneAndUpdate(
+            { "products.productId": productId }, // Match the product in the products array
+            { $set: { "products.$.productStatus": newStatus } }, // Update the productStatus of the matched product
+            { new: true } // Return the updated document
+        );
+
+        if (!productsResult) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in ProductsModal."
+            });
+        }
+
+        // Update the product in the ProductDetailsModal
+        const productDetailsResult = await ProductDetailsModal.findOneAndUpdate(
+            { productId }, // Match by productId
+            { $set: { productStatus: newStatus } }, // Update the productStatus
+            { new: true } // Return the updated document
+        );
+
+        if (!productDetailsResult) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in ProductDetailsModal."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Auction status updated successfully in both models.",
+        });
+    } catch (error) {
+        console.error("Error updating auction status:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error. Could not update auction status.",
+        });
+    }
+};
+
+
+
+
+
+const completeAuction = async (req, res) => {
+    try {
+        const { productId } = req.body;
+
+        if (!productId) {
+            return res.status(400).json({ message: "Product ID is required" });
+        }
+
+        // Fetch auction and product details from MongoDB
+        const auction = await Auction.findOne({ auction_id: productId });
+        const product = await ProductDetailsModal.findOne({ productId });
+
+        if (!auction || !product) {
+            return res.status(404).json({ message: "Auction or Product not found" });
+        }
+
+        // Call getFlaskInfoById with the provided auction_id
+        const auctionData = await getFlaskInfoById(productId);
+
+        // Call Flask API to handle auction completion
+        const flaskApiUrl = `${process.env.REACT_APP_FLASK_API_URL}/complete-auction`;
+        const flaskResponse = await axios.post(flaskApiUrl, {
+            auctionData,  // Send the obtained auction data
+        });
+
+        if (flaskResponse.status !== 200) {
+            throw new Error("Flask API responded with an error");
+        }
+
+        const { shill_status } = flaskResponse.data;
+        console.log(shill_status); // Log the renamed status
+
+        // Determine the auction status
+        let newAuctionStatus = 'completed';
+        let winner = auction.highest_bidder_id || "Item didn't meet required price";
+
+        if (auction.highest_bid <= parseFloat(product.reservedPrice)) {
+            newAuctionStatus = 'withDrawn';
+            winner = "Item didn't meet required price";
+        }
+
+        let payment_status = "no_need"; // Default value
+        if (winner.startsWith("BID")) {
+            payment_status = "pending";
+        }
+
+        // Update the auction and product details in MongoDB
+        await Auction.updateOne(
+            { auction_id: productId },
+            { $set: { auction_status: newAuctionStatus } }
+        );
+
+        await ProductDetailsModal.updateOne(
+            { productId },
+            {
+                $set: {
+                    auctionStatus: newAuctionStatus,
+                    winner,
+                    shillBiddingStatus: shill_status,
+                    paymentStatus: payment_status,
+                },
+            }
+        );
+
+        // Update the respective product in ProductsModal
+        await ProductsModal.updateOne(
+            { "products.productId": productId }, // Find the specific product in the array
+            {
+                $set: {
+                    "products.$.auctionStatus": newAuctionStatus,
+                    "products.$.shillBiddingStatus": shill_status,
+                    "products.$.paymentStatus": payment_status,
+                },
+            }
+        );
+
+        // Respond with a success message
+        res.status(200).json({
+            message: "Auction completed successfully",
+            data: { auctionStatus: newAuctionStatus, winner, shill_status },
+        });
+    } catch (err) {
+        console.error("Error completing auction:", err);
+        res.status(500).json({ message: "Failed to complete auction", error: err.message });
+    }
+};
+
+
+
+// Get participated bids for the logged-in user
+const fetchBids = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        console.log(`Fetching bids for userId: ${userId}`);
+        
+        const bidderData = await BiddersAuction.findOne({ bidder_id: userId });
+        if (!bidderData) {
+            return res.status(404).json({ message: 'No bids found for this user.' });
+        }
+
+        const participatedBids = [];
+        for (const [productId, bidHistory] of bidderData.bid_history.entries()) {
+            const product = await ProductDetailsModal.findOne({ productId });
+            if (product) {
+                participatedBids.push({
+                    productId: product.productId,
+                    productName: product.productName,
+                    auctionStatus: product.auctionStatus,
+                    winner: product.winner,
+                    logo:product.logoImageName,
+                    base:product.minimumPrice,
+                    bidHistory, // Include the bid history
+                });
+            }
+        }
+
+        // console.log(participatedBids);
+        res.json(participatedBids);
+    } catch (error) {
+        console.error('Error fetching participated bids:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+
+const fetchWonBids = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        console.log(userId)
+
+        const wonBids = await ProductDetailsModal.find({
+            winner: userId,
+        }).select('productId productName paymentStatus logoImageName');
+
+        if (!wonBids.length) {
+            return res.status(404).json({ message: 'No won bids found.' });
+        }
+
+        res.json(wonBids);
+    } catch (error) {
+        console.error('Error fetching won bids:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+
+
+
+
 module.exports = {
     genotp,
     getSellerDetails,
-    getFlaskInfo,
     placeBid,
+    updateIpfsHash,
+    fetchWonBids,
+    fetchBids,
+    getTransactionDetails,
+    updateAuctionStatus,
+    getProductDetailsById,
+    trackProduct,
+    getBidderAnalytics,
+    updateProductStatus,
     signup,
     login,
     getProfile,
+    completeAuction,
     getotp,
     getProductDetails,
+    completePayment,
     addProduct
 };

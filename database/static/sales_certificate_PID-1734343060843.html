@@ -1,0 +1,133 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Sales Certificate</title>
+            <style>
+                body {
+                    font-family: 'Georgia', serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f3f4f6;
+                    color: #333;
+                }
+                .certificate-header img.logo {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    }
+                .certificate {
+                    width: 210mm;
+                    height: 297mm;
+                    margin: auto;
+                    padding: 30px;
+                    background: linear-gradient(to bottom, #ffffff, #f7f9fc);
+                    border: 12px double #020202;
+                    border-radius: 10px;
+                    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    box-sizing: border-box;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .watermark {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) rotate(-45deg);
+                    font-size: 90px;
+                    color: rgba(26, 115, 232, 0.1);
+                }
+                .certificate-header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .certificate-header img {
+                    width: 90px;
+                    height: 90px;
+                    border-radius: 50%;
+                }
+                .certificate-header h1 {
+                    font-size: 36px;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                }
+                .content {
+                    font-size: 16px;
+                    line-height: 1.8;
+                    text-align: justify;
+                }
+                .details {
+                    margin: 20px 0;
+                    padding: 15px;
+                    border: 2px solid black;
+                    background-color: #eef4ff;
+                    font-size: 16px;
+                }
+                .footer {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-end;
+                }
+                .footer img {
+                    width: 200px;
+                }
+                .certificate-footer {
+                    text-align: center;
+                    font-size: 12px;
+                    color: #555;
+                }
+                @media print {
+                    body {
+                        background-color: #fff;
+                    }
+                    .certificate {
+                        border: 10px solid black;
+                        box-shadow: none;
+                        margin: 0;
+                        padding: 20px;
+                        page-break-after: avoid;
+                        width: 210mm;
+                        height: 297mm;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+                <div class="watermark">NEXTGEN AUCTION</div>
+                <div class="certificate-header">
+                    <img src="https://thumbs.dreamstime.com/b/verified-stamp-seal-vector-illustration-rubber-simple-isolated-white-background-158487628.jpg" alt="Logo" class="logo">
+                    <h1><u> Sales Certificate</u></h1>
+                    <h2>Issued by NextGen Auction</h2>
+                </div>
+                <div class="content">
+                    <p>
+                        This is to certify that <strong>NextGen Auction</strong>, an authorized and reputed organization in conducting auctions, has successfully completed the sale of the listed item as per the guidelines and regulations. The auction was conducted in a fair and transparent manner, ensuring the highest standards of professionalism.
+                    </p>
+                    <p class="details">
+                        On <strong>16-12-2024</strong>, the product <strong>Rolex Watch</strong>, described as "(Brief Description of the Product)," was successfully auctioned to <strong>surya</strong>. The auction, listed by <strong>vishnu</strong>, concluded with a final bid amount of <strong>$10250</strong>, awarded at <strong>15:37:58</strong>.
+                    </p>
+                    <p>
+                        The bidder, having satisfied all the necessary requirements and completed the bidding process, has been declared the winner. This certificate confirms the transfer of ownership rights of the above-mentioned product to the winning bidder.
+                    </p>
+                    <p>
+                        Issued as a formal acknowledgment, this certificate serves as proof of sale and may be used for any future references or legal documentation. We appreciate the participation and integrity shown by all parties involved.
+                    </p>
+                </div>
+                <div class="footer">
+                    <img src="barcode_image_transparent.png" alt="Barcode">
+                    <img src="stamp.png" alt="Stamp">
+                </div>
+                <div class="certificate-footer">
+                    &copy; 2024 NextGen Auction. All Rights Reserved.<br>
+                    For inquiries, please contact our support team at support@nextgenauction.com.
+                </div>
+            </div>
+        </body>
+        </html>
+        

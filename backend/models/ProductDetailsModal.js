@@ -74,7 +74,7 @@ const productDetailsSchema = new mongoose.Schema({
     },
     auctionStatus: {
         type: String,
-        enum: ['upcoming', 'ongoing', 'completed','closed'], // Restrict to valid statuses
+        enum: ['upcoming', 'ongoing', 'completed','closed','withDrawn'], // Restrict to valid statuses
         required: true,
     },
     winner: {
