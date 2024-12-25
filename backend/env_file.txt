@@ -1,0 +1,21 @@
+# MongoDB Connection
+REACT_APP_MongoLink="__YOUR_MONGO_LINK__"
+
+# Secret Keys
+REACT_APP_SecretKey="__YOUR_SECRET_KEY__"
+
+# Server Ports
+REACT_APP_ServerPort=__SERVER_PORT__
+REACT_APP_SsePort=__SSE_PORT__
+
+# Timings and Durations
+REACT_APP_RecallDuration=__RECALL_DURATION__  # Recall duration in milliseconds
+REACT_APP_MaxAge=__MAX_AGE__                  # Max age in milliseconds
+
+# Main Server and API URLs
+REACT_APP_MainServer=__MAIN_SERVER_URL__
+REACT_APP_FLASK_API_URL="__FLASK_API_URL__"
+
+# Uncomment these for local development:
+# REACT_APP_MainServer=http://localhost:3000
+# REACT_APP_FLASK_API_URL="http://127.0.0.1:5001"

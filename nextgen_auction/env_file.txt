@@ -1,0 +1,27 @@
+# Basic Test Variable
+REACT_APP_test="Hello From .ENV FILE"
+
+# Server URLs
+REACT_APP_SseServerUrl=__SSE_SERVER_URL__  # SSE Server URL
+REACT_APP_ServerUrl=__SERVER_URL__         # Main server URL
+REACT_APP_DataServer=__DATA_SERVER_URL__   # Data server URL
+REACT_APP_MainServer=__MAIN_SERVER_URL__   # Main application server URL
+REACT_APP_FlaskUrl=__FLASK_URL__           # Flask API URL
+
+# Uncomment for local development
+# REACT_APP_FlaskUrl="http://127.0.0.1:5001"
+# REACT_APP_ServerUrl="http://localhost:5000"
+# REACT_APP_SseServerUrl="http://localhost:5003"
+# REACT_APP_DataServer="http://localhost:8000"
+# REACT_APP_MainServer="http://localhost:3000"
+
+# Secret Keys and Authentication
+REACT_APP_SecretKey=__SECRET_KEY__               # Application secret key
+REACT_APP_PinataJwt=__PINATA_JWT__               # Pinata JWT for IPFS
+REACT_APP_PinataGateway=__PINATA_GATEWAY__       # Pinata gateway URL
+React_APP_ApiSecretKey=__API_SECRET_KEY__        # API secret key
+React_APP_ApiKey=__API_KEY__                     # API key
+
+# Admin and Smart Contract
+REACT_APP_AdminAddress=__ADMIN_ADDRESS__         # Admin wallet address
+REACT_APP_CONTRACT_ABI=__CONTRACT_ABI__          # Contract ABI (JSON string or file path)

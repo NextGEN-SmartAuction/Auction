@@ -1,0 +1,8 @@
+# File Upload Configuration
+REACT_APP_UPLOAD_FOLDER=__UPLOAD_FOLDER_PATH__  # Absolute path to the upload folder
+REACT_APP_ALLOWED_EXTENSIONS=__ALLOWED_EXTENSIONS__  # Comma-separated list of allowed extensions (e.g., png,jpg,jpeg,gif)
+
+# Application URLs and Ports
+# REACT_APP_URL=http://localhost:3000  # Uncomment for local development
+REACT_APP_URL=__REACT_APP_URL__  # React app's URL
+REACT_APP_PORT=__FLASK_APP_PORT__  # Flask app's port
