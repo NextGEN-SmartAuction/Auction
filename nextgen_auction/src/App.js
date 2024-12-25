@@ -24,6 +24,7 @@ import ViewCertificate from './components/admin/ViewCertificate';
 import GenerateCertificate from './components/admin/GenerateCertificate';
 import FooterComponent from './components/Footer';
 import WinnerList from './components/seller/WinnerList';
+import FileManagement from './components/admin/FileManagement';
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -72,6 +73,7 @@ function App() {
                             <Route index element={<Hero />} />
                             <Route path="SaleCertificate" element={<SaleCertificate />} />
                             <Route path="ViewCertificate" element={<ViewCertificate />} />
+                            <Route path="goat" element={<FileManagement />} />
 
                             {/* <Route path="WinnersList" element={<WinnersList />} /> */}
                         </Route>

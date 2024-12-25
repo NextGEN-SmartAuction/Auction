@@ -4,10 +4,8 @@ const Hero = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const sliderImages = [
         "https://www.cisworld.lk/storage/categories/online-auction.jpg",
-        "https://picsum.photos/id/1015/1920/1080",
-        "https://picsum.photos/id/1018/1920/1080",
-        "https://picsum.photos/id/1021/1920/1080",
-        "https://picsum.photos/id/1023/1920/1080",
+        "https://blog.procureport.com/wp-content/uploads/2023/11/Online-Reverse-Auction-Software-1280x640.jpg",
+        "https://c0.wallpaperflare.com/preview/33/1006/431/gavel-auction-hammer-justice.jpg",
     ];
 
     useEffect(() => {

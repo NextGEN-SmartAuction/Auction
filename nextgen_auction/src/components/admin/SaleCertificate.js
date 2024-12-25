@@ -71,7 +71,7 @@ const SaleCertificate = () => {
                                         <strong>Winner:</strong> {product.bidderName}
                                     </p>
                                     <p className="card-text mb-2">
-                                        <strong>Bid:</strong> {product.amount} ETH
+                                        <strong>Bid:</strong> {product.amount} ₹
                                     </p>
                                     <button
                                         className="btn btn-primary btn-sm mt-2"
@@ -85,7 +85,7 @@ const SaleCertificate = () => {
                     ))}
                 </div>
             ) : (
-                <p className="text-center text-muted">No products with null ipfsHash</p>
+                <p className="text-center text-muted">No products arrived</p>
             )}
         </div>
     );

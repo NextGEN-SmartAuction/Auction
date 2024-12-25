@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { PinataSDK } from "pinata-web3";
 import Web3Connector from "./Web3Connector";
-import axios from 'axios';
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const pinata = new PinataSDK({
-    pinataJwt: `${process.env.REACT_APP_pinataJWT}`,
-    pinataGateway: `${process.env.REACT_APP_pinataGateway}`,
+    pinataJwt: `${process.env.REACT_APP_PinataJwt}`,
+    pinataGateway: `${process.env.REACT_APP_PinataGateway}`,
 });
 
 const GenerateCertificate = () => {
@@ -21,18 +21,14 @@ const GenerateCertificate = () => {
     const [contract1, setContract1] = useState(null);
     const [contractStatus, setContractStatus] = useState("");
     const [uploadedFile, setUploadedFile] = useState(null);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const handleFetchCertificate = async () => {
         try {
             const response = await axios.post(
                 `${process.env.REACT_APP_FlaskUrl}/generateCertificate`,
-                {
-                    ...product,
-                },
-                {
-                    headers: { "Content-Type": "application/json" },
-                }
+                { ...product },
+                { headers: { "Content-Type": "application/json" } }
             );
             const data = response.data;
             setCertificateUrl(data.pdfUrl);
@@ -42,32 +38,28 @@ const GenerateCertificate = () => {
     };
 
     const handleFileUpload = (event) => {
-        const file = event.target.files[0];
-        if (file && file.type === "application/pdf") {
-            setUploadedFile(file);
-        } else {
-            alert("Please upload a valid PDF file.");
-        }
+        setUploadedFile(event.target.files[0]);
     };
 
-    const handleStoreCertificate = async () => {
+    const handleUploadAndStore = async () => {
+        if (!uploadedFile) {
+            setUploadStatus("Please select a file to upload.");
+            return;
+        }
+
         try {
-            setUploadStatus("Uploading to Web3...");
-            let file;
-    
-            if (uploadedFile) {
-                file = new File([uploadedFile],uploadedFile.name, {
-                    type: uploadedFile.type,
-                });
-            } else {
-                setUploadStatus("Choose a file.... then try again");
-                return;
-            }
-    
+            setUploadStatus("Uploading to IPFS...");
+            const file = new File([uploadedFile], uploadedFile.name, {
+                type: uploadedFile.type,
+            });
             const upload = await pinata.upload.file(file);
-            setUploadStatus(`Uploaded successfully! IPFS Hash: ${upload.IpfsHash}`);
-    
-            // Directly use the fields from the product object and MongoDB
+            const ipfsHash = upload.IpfsHash;
+            setUploadStatus(`Upload successful! IPFS Hash: ${ipfsHash}`);
+
+            // Wait for 2 seconds
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
+            setUploadStatus("Uploading to Web3...");
             const result = await contract1.methods
                 .addPurchase(
                     product.productId,
@@ -80,45 +72,45 @@ const GenerateCertificate = () => {
                     product.transactionId,
                     product.date,
                     product.time,
-                    upload.IpfsHash
+                    ipfsHash
                 )
                 .send({ from: account });
-    
+
             console.log(result);
-    
-            // Once contract interaction is complete, update the IPFS hash in the database
-            setUploadStatus("Certificate stored on mongo!");
-            await updateTransactionIpfsHash(product.productId, upload.IpfsHash);
-    
-            // Call the updateProductStatus API with "sold" status after updating the IPFS hash
+
+            setUploadStatus("Certificate stored in MongoDB!");
+            await updateTransactionIpfsHash(product.productId, ipfsHash);
+
+            // Update product status
             await updateProductStatus(product.productId);
-    
-            setUploadStatus("Certificate stored on blockchain!");
-    
-            // Navigate to /admin/SaleCertificate after 4 seconds on success
+
+            setUploadStatus("Certificate stored on Blockchain!");
+
+            // Redirect after 4 seconds
             setTimeout(() => {
                 navigate("/admin/SaleCertificate");
             }, 4000);
         } catch (error) {
-            setUploadStatus(`Failed to upload certificate: ${error.message}`);
+            setUploadStatus(`Failed to upload and store certificate: ${error.message}`);
         }
     };
-    
+
     const updateProductStatus = async (productId) => {
         try {
             const response = await axios.post(
                 `${process.env.REACT_APP_ServerUrl}/updateProductStatus`,
-                { productId, newStatus:"sold" },
+                { productId, newStatus: "sold" },
                 { withCredentials: true }
-
             );
-    
+
             console.log("Product status updated:", response.data);
         } catch (error) {
-            console.error("Error updating product status:", error.response ? error.response.data : error.message);
+            console.error(
+                "Error updating product status:",
+                error.response ? error.response.data : error.message
+            );
         }
     };
-    
 
     const updateTransactionIpfsHash = async (productId, ipfsHash) => {
         try {
@@ -127,10 +119,13 @@ const GenerateCertificate = () => {
                 { productId, ipfsHash },
                 { headers: { "Content-Type": "application/json" } }
             );
-    
+
             console.log("Transaction IPFS Hash updated:", response.data);
         } catch (error) {
-            console.error("Error updating IPFS Hash in the database:", error.response ? error.response.data : error.message);
+            console.error(
+                "Error updating IPFS Hash in the database:",
+                error.response ? error.response.data : error.message
+            );
         }
     };
 
@@ -140,7 +135,6 @@ const GenerateCertificate = () => {
             return;
         }
 
-        // Open the certificate in a new tab
         const newTab = window.open("", "_blank");
 
         if (newTab) {
@@ -151,11 +145,7 @@ const GenerateCertificate = () => {
                     onload="window.print();">
                 </iframe>
             `);
-
-            // Optional: Add the filename to the document title for clarity
             newTab.document.title = `${product.productId}_certificate.pdf`;
-
-            // Close the new tab after printing
             newTab.document.close();
         } else {
             alert("Failed to open the certificate. Please check your pop-up settings.");
@@ -167,18 +157,37 @@ const GenerateCertificate = () => {
             toast.error("Certificate URL is not available.");
             return;
         }
-
+    
         const pdfName = `${product.productId}_certificate`;
-
-        navigator.clipboard.writeText(pdfName)
-            .then(() => {
+    
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard
+                .writeText(pdfName)
+                .then(() => {
+                    toast.success("PDF name copied to clipboard!");
+                })
+                .catch((error) => {
+                    console.error("Failed to copy PDF name:", error);
+                    toast.error("Failed to copy PDF name.");
+                });
+        } else {
+            // Fallback for unsupported browsers
+            const textarea = document.createElement("textarea");
+            textarea.value = pdfName;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand("copy");
                 toast.success("PDF name copied to clipboard!");
-            })
-            .catch((error) => {
-                console.error("Failed to copy PDF name:", error);
+            } catch (error) {
+                console.error("Failed to copy using fallback:", error);
                 toast.error("Failed to copy PDF name.");
-            });
+            }
+            document.body.removeChild(textarea);
+        }
     };
+    
+    
 
     return (
         <>
@@ -214,10 +223,9 @@ const GenerateCertificate = () => {
                             />
                             <button
                                 className="btn btn-success mx-2"
-                                onClick={handleStoreCertificate}
-                                disabled={!certificateUrl && !uploadedFile}
+                                onClick={handleUploadAndStore}
                             >
-                                Store Certificate in Web3
+                                Upload to IPFS and Store in Web3
                             </button>
                             <button
                                 className="btn btn-secondary mx-2"
